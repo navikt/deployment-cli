@@ -178,12 +178,14 @@ fn handle_deploy_command(subcommand: &ArgMatches) {
 
     let git_ref = subcommand.value_of("ref").unwrap();
     let cluster = subcommand.value_of("cluster").unwrap();
-    let team = subcommand.value_of("team").unwrap();
-    let version = subcommand.value_of("version").unwrap();
+    let team = subcommand.value_of("team")
+        .expect("To create a deployment you need to specify a team");
+    let version = subcommand.value_of("version")
+        .expect("To create a deployment you need to specify a version");
 
     config["ref"] = Value::String(git_ref.to_owned());
     config["cluster"] = Value::String(cluster.to_owned());
-    config["team"] = Value::String(team.to_owned());
+    config["team"] = Value::String(team.to_owned()).expect("");
     config["version"] = Value::String(version.to_owned());
 
     let resources: Vec<Value> = resource_matches

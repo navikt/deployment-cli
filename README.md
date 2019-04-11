@@ -1,7 +1,7 @@
 # deployment-cli
 Simple utility for templating kubernetes resources, authenticating as a github app and creating a deployment through
 the github api. Currently it only supports yaml resource files and json config files. This will be improved on in the
-future.
+future. Its a companion tool for https://github.com/navikt/deployment
 
 ## General usage
 To see a list of usable commands you can start with using:
@@ -28,7 +28,7 @@ should be pulled. Specified using the `--version` flag
 
 The most basic deployment should look something like:
                                                                                    
-`deployment-cli create --environment=dev-fss --repository=navikt/deployment --appid=1234 --key=/path/to/private-key.pem -r=nais.yaml -c=placeholders.json`
+`deployment-cli create --environment=dev-fss --repository=navikt/deployment -t <team> --version=1.0.0 --appid=1234 --key=/path/to/private-key.pem -r=nais.yaml -c=placeholders.json`
                                                                                    
 Note: For deployments using github apps the private key has to be pem encoded.
 
