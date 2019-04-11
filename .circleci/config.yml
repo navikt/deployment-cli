@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  linux_build:
     docker:
       - image: "circleci/rust:1.33.0"
     steps:
@@ -9,7 +9,7 @@ jobs:
           name: Install required dependencies
           command: |
             sudo apt update
-            sudo apt install -y musl musl-tools openssl
+            sudo apt install -y musl musl-tools
       - run:
           name: Install build target
           command: rustup target add x86_64-unknown-linux-musl
@@ -18,4 +18,25 @@ jobs:
           command: cargo build --release --target x86_64-unknown-linux-musl
       - store_artifacts:
           path: target/x86_64-unknown-linux-musl/release/deployment-cli
+  macos_build:
+    macos:
+      xcode: "10.0.0"
+      steps:
+        - checkout
+        - run:
+            name: Install rustup
+            command: curl https://sh.rustup.rs -sSf | sh
+        - run:
+            name: Build executable
+            command: cargo build --release
+        - store_artifacts:
+            path: target/release/deployment-cli
+workflows:
+  version: 2
+  linux:
+    jobs:
+      - linux_build
+  macos:
+    jobs:
+      - macos_build
 only: master
