@@ -21,16 +21,16 @@ jobs:
   macos_build:
     macos:
       xcode: "10.0.0"
-      steps:
-        - checkout
-        - run:
-            name: Install rustup
-            command: curl https://sh.rustup.rs -sSf | sh
-        - run:
-            name: Build executable
-            command: cargo build --release
-        - store_artifacts:
-            path: target/release/deployment-cli
+    steps:
+      - checkout
+      - run:
+          name: Install rustup
+          command: curl https://sh.rustup.rs -sSf | sh
+      - run:
+          name: Build executable
+          command: cargo build --release
+      - store_artifacts:
+          path: target/release/deployment-cli
 workflows:
   version: 2
   linux:
