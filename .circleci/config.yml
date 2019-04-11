@@ -8,8 +8,8 @@ jobs:
       - run:
           name: Install required dependencies
           command: |
-            apt update
-            apt install -y musl musl-tools openssl
+            sudo apt update
+            sudo apt install -y musl musl-tools openssl
       - run:
           name: Install build target
           command: rustup target add x86_64-unknown-linux-musl
