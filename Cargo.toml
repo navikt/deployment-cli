@@ -11,6 +11,12 @@ serde_derive="1.0"
 serde_yaml="0.8"
 handlebars="2.0.0-beta.1"
 clap="2"
-jsonwebtoken = "5"
-reqwest="0.9"
+# TODO: Move to stable whenever its updated to ring 0.14
+jsonwebtoken = {git="https://github.com/Keats/jsonwebtoken", branch="next"}
 rpassword="3.0.1"
+
+[dependencies.reqwest]
+version="0.9"
+features=["rustls-tls"]
+default-features=false
+

@@ -150,9 +150,11 @@ fn main() {
     if let Some(token_command) = matches.subcommand_matches("token") {
         handle_token_command(token_command);
     }
+
     if let Some(deploy_command) = matches.subcommand_matches("deploy") {
         handle_deploy_command(deploy_command);
     }
+
 }
 
 fn handle_token_command(subcommand: &ArgMatches) {
@@ -185,7 +187,7 @@ fn handle_deploy_command(subcommand: &ArgMatches) {
 
     config["ref"] = Value::String(git_ref.to_owned());
     config["cluster"] = Value::String(cluster.to_owned());
-    config["team"] = Value::String(team.to_owned()).expect("");
+    config["team"] = Value::String(team.to_owned());
     config["version"] = Value::String(version.to_owned());
 
     let resources: Vec<Value> = resource_matches

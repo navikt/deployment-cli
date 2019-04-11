@@ -1,0 +1,21 @@
+version: 2
+  docker:
+    - image: "circleci/rust:1.33.0"
+jobs:
+  build:
+    steps:
+      - checkout
+      - run:
+          name: Install required dependencies
+          command: |
+            apt update
+            apt install -y musl musl-tools openssl
+      - run:
+          name: Install build target
+          command: rustup target add x86_64-unknown-linux-musl
+      - run:
+          name: Build executable
+          command: cargo build --release --target x86_64-unknown-linux-musl
+      - store_artifacts:
+          path: target/x86_64-unknown-linux-musl/release/deployment-cli
+only: master
