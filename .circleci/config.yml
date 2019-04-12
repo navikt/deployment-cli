@@ -77,7 +77,7 @@ jobs:
           at: /tmp/workspace
       - run:
           name: List workspace files
-          command: bash -c "ls /tmp/workspace/**/*"
+          command: bash -c "ls /tmp/workspace/target/*"
 
 workflows:
   version: 2
