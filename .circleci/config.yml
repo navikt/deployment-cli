@@ -24,7 +24,7 @@ jobs:
           command: cp -R target/* /tmp/workspace/
       - persist_to_workspace:
           root: /tmp/workspace/
-          paths: *
+          paths: target/*
       - store_artifacts:
           path: target/x86_64-unknown-linux-musl/release/deployment-cli
   macos_build:
@@ -62,7 +62,7 @@ jobs:
           command: cp -R target/* /tmp/workspace/
       - persist_to_workspace:
           root: /tmp/workspace/
-          paths: *
+          paths: target/*
       - store_artifacts:
           path: target/x86_64-apple-darwin/release/deployment-cli
   github_release:
