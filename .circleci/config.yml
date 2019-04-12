@@ -73,11 +73,20 @@ jobs:
     docker:
       - image: "circleci/golang:1.8"
     steps:
+      - run:
+          name: Install ghr
+          command: go get github.com/tcnksm/ghr
       - attach_workspace:
           at: /tmp/workspace
       - run:
-          name: List workspace files
-          command: bash -c "ls /tmp/workspace/*"
+          name: Compress files
+          command: |
+            mkdir artifacts
+            cat /tmp/workspace/x86_64-unknown-linux-musl/release/deployment-cli | xz > artifacts/deployment-cli-${}-x86_64-unknown-linux-musl.xz
+            cat /tmp/workspace/x86_64-apple-darwin/release/deployment-cli | xz > artifacts/deployment-cli-${}-x86_64-apple-darwin.xz
+      - run:
+          name: Create release
+          command: ghr -t ${GITHUB_RELEASES_TOKEN} -u ${GITHUB_RELEASES_USERNAME} -r ${CIRCLECI_PROJECT_REPONAME} -c ${CIRCLECI_SHA1} -delete ${} artifacts/
 
 workflows:
   version: 2
@@ -89,7 +98,7 @@ workflows:
           requires:
             - linux_build
             - macos_build
-#          filters:
-#            tags:
-#              only: /^v.+/
+          filters:
+            tags:
+              only: /^v.+/
 only: master

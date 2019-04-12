@@ -1,5 +1,6 @@
 extern crate handlebars;
 
+extern crate base64;
 extern crate clap;
 extern crate jsonwebtoken as jwt;
 extern crate reqwest;
@@ -88,8 +89,14 @@ fn main() {
                 .long("key")
                 .help("Private key for github application")
                 .takes_value(true)
-                .env("APP_KEY")
-                .required(true))
+                .env("GITHUB_APP_KEY")
+                .required_unless("key-base64"))
+            .arg(Arg::with_name("key-base64")
+                .long("key-base64")
+                .help("Private key for github applications, base64 encoded PEM")
+                .takes_value(true)
+                .env("GITHUB_APP_KEY_BASE64")
+                .required_unless("key"))
             .arg(Arg::with_name("account")
                 .long("account")
                 .help("Account for the installation id")
@@ -128,9 +135,14 @@ fn main() {
                     .long("key")
                     .help("Private key for github application")
                     .takes_value(true)
-                    .env("APP_KEY")
-                    .required_unless("username")
-                    .group("github-apps-auth"))
+                    .env("GITHUB_APP_KEY")
+                    .required_unless("key-base64"))
+                .arg(Arg::with_name("key-base64")
+                    .long("key-base64")
+                    .help("Private key for github applications, base64 encoded PEM")
+                    .takes_value(true)
+                    .env("GITHUB_APP_KEY_BASE64")
+                    .required_unless("key"))
 
                 .arg(Arg::with_name("repository")
                     .long("repository")
@@ -251,14 +263,19 @@ fn handle_deploy_command(subcommand: &ArgMatches) {
 
 fn installation_token_for(subcommand: &ArgMatches, account: &str) -> InstallationToken {
     let app_id = subcommand.value_of("appid").unwrap();
-    let app_key = subcommand.value_of("key").unwrap();
+    let pem = if let Some(app_key) = subcommand.value_of("key") {
+        let mut pem = vec![];
 
-    let mut pem = vec![];
+        File::open(app_key)
+            .expect("Failed to open github apps key")
+            .read_to_end(&mut pem)
+            .expect("Failed to read contents of github apps key");
+        pem
+    } else {
+        let key_base64 = subcommand.value_of("key-base64").unwrap();
+        base64::decode(key_base64).expect("Failed to decode base64 pem file")
+    };
 
-    File::open(app_key)
-        .expect("Failed to open github apps key")
-        .read_to_end(&mut pem)
-        .expect("Failed to read contents of github apps key");
 
     fetch_installation_token(app_id, account, pem.as_slice())
         .expect("Failed to fetch installation token")
