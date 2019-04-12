@@ -84,20 +84,15 @@ jobs:
       - run:
           name: Compress files
           command: |
-            ls /tmp/workspace/target/
-            ls /tmp/workspace/target/x86_64-unknown-linux-musl/
-            ls /tmp/workspace/target/x86_64-unknown-linux-musl/release/
+            echo ${CIRCLE_TAG}
+            echo ${CIRCLE_SHA1}
+            echo ${CIRCLE_PROJECT_REPONAME}
             mkdir artifacts
             cat /tmp/workspace/target/x86_64-unknown-linux-musl/release/deployment-cli | lzma > artifacts/deployment-cli-${CIRCLECI_TAG}-x86_64-unknown-linux-musl.xz
             cat /tmp/workspace/target/x86_64-apple-darwin/release/deployment-cli | lzma > artifacts/deployment-cli-${CIRCLECI_TAG}-x86_64-apple-darwin.xz
       - run:
-          name: Download and mark deployment-cli as executable
-          command: |
-            wget https://49-180783237-gh.circle-artifacts.com/0/home/circleci/project/target/x86_64-unknown-linux-musl/release/deployment-cli
-            chmod +x deployment-cli
-      - run:
           name: Create release
-          command: ghr -t $(./deployment-cli token) -u x-access-token -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} artifacts/
+          command: ghr -t "$(/tmp/workspace/target/x86_64-unknown-linux-musl/release/deployment-cli token)" -u x-access-token -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} artifacts/
 
 workflows:
   version: 2
