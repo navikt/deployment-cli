@@ -75,14 +75,9 @@ jobs:
 
 workflows:
   version: 2
-  linux:
-    jobs:
+  build_and_release:
       - linux_build
-  macos:
-    jobs:
       - macos_build
-  github_release:
-    jobs:
       - github_release:
           requires:
             - linux
