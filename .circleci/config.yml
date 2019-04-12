@@ -9,7 +9,7 @@ jobs:
           docker_layer_caching: true
       - run:
           name: Create workspace
-          command: mkdir -p /tmp/workspace/target
+          command: mkdir -p /tmp/workspace
       - run:
           name: Install required dependencies
           command: |
@@ -26,7 +26,7 @@ jobs:
           command: cp -R target /tmp/workspace/
       - persist_to_workspace:
           root: /tmp/workspace/
-          paths: target/*
+          paths: target/x86_64*
       - store_artifacts:
           path: target/x86_64-unknown-linux-musl/release/deployment-cli
   macos_build:
@@ -38,7 +38,7 @@ jobs:
           docker_layer_caching: true
       - run:
           name: Create workspace
-          command: mkdir -p /tmp/workspace/target
+          command: mkdir -p /tmp/workspace
       - run:
           name: Install required dependencies
           command: |
@@ -63,7 +63,7 @@ jobs:
           command: cargo build --release --target x86_64-apple-darwin
       - run:
           name: Copy build to workspace
-          command: cp -R target/* /tmp/workspace/
+          command: cp -R target/x86_64* /tmp/workspace/
       - persist_to_workspace:
           root: /tmp/workspace/
           paths: target
@@ -77,7 +77,7 @@ jobs:
           at: /tmp/workspace
       - run:
           name: List workspace files
-          command: bash -c "ls /tmp/workspace/target/*"
+          command: bash -c "ls /tmp/workspace/*"
 
 workflows:
   version: 2
