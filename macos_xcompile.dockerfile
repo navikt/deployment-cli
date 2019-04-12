@@ -9,16 +9,11 @@ RUN git clone https://github.com/tpoechtrager/osxcross
 WORKDIR /osxcross
 
 ENV PKG_CONFIG_ALLOW_CROSS=1
-ENV TARGET_CC="/usr/local/osx-ndk-x86/bin/x86_64-apple-darwin15-cc"
-ENV UNATTENDED=yes
-ENV OSX_VERSION_MIN=10.7
+ENV TARGET_CC="/osxcross/target/bin/x86_64-apple-darwin15-cc"
 
-RUN wget https://s3.dockerproject.org/darwin/v2/MacOSX10.11.sdk.tar.xz
-RUN mv MacOSX10.11.sdk.tar.xz tarballs/
-RUN ./build.sh
-RUN mkdir -p /usr/local/osx-ndk-x86
-RUN mv target/* /usr/local/osx-ndk-x86
-COPY .circleci/cargo_config .cargo/config
+COPY buildscripts/setup_osxcross.sh .
+RUN ./setup_osxcross.sh
+COPY buildscripts/cargo_config .cargo/config
 
 RUN USER=root cargo new --bin deployment-cli
 WORKDIR deployment-cli
