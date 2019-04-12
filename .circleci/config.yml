@@ -19,18 +19,39 @@ jobs:
       - store_artifacts:
           path: target/x86_64-unknown-linux-musl/release/deployment-cli
   macos_build:
-    macos:
-      xcode: "10.0.0"
+    docker:
+      - image: "circleci/rust:1.33.0"
     steps:
       - checkout
       - run:
-          name: Install rustup
-          command: curl https://sh.rustup.rs -sSf | sh
+          name: Install required dependencies
+          command: |
+            apt update
+            apt install wget git clang
+      - run:
+          name: Install build target
+          command: rustup target add x86_64-apple-darwin
+      - run:
+          name: Install osxcross
+          environment:
+            UNATTENDED: 'yes'
+            OSX_VERSION_MIN: '10.7'
+          command: |
+            wget https://s3.dockerproject.org/darwin/v2/MacOSX10.11.sdk.tar.xz
+            mv MacOSX10.11.sdk.tar.xz tarballs/
+            ./build.sh
+            mkdir -p /usr/local/osx-ndk-x86
+            mv target/* /usr/local/osx-ndk-x86
+            mkdir .cargo
+            cp .circleci/cargo_config .cargo/config
       - run:
           name: Build executable
-          command: cargo build --release
+          environment:
+            TARGET_CC: '/usr/local/osx-ndk-x86/bin/x86_64-apple-darwin15-cc'
+            PKG_CONFIG_ALLOW_CROSS: '1'
+          command: cargo build --release --target x86_64-apple-darwin
       - store_artifacts:
-          path: target/release/deployment-cli
+          path: target/x86_64-apple-darwin/release/deployment-cli
 workflows:
   version: 2
   linux:
