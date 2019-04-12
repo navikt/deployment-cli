@@ -73,11 +73,11 @@ jobs:
     docker:
       - image: "circleci/golang:1.8"
     steps:
+      - attach_workspace:
+          at: /tmp/workspace
       - run:
           name: Install ghr
           command: go get github.com/tcnksm/ghr
-      - attach_workspace:
-          at: /tmp/workspace
       - run:
           name: Compress files
           command: |
