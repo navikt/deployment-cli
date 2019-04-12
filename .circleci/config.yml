@@ -83,7 +83,7 @@ workflows:
       - macos_build
   github_release:
     jobs:
-      - github_release
+      - github_release:
           requires:
             - linux_build
             - macos_build
