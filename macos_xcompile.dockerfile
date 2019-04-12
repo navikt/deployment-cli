@@ -16,7 +16,7 @@ RUN USER=root cargo new --bin deployment-cli
 WORKDIR deployment-cli
 
 ENV PKG_CONFIG_ALLOW_CROSS=1
-ENV TARGET_CC="/osxcross/osxcross/target/bin/x86_64-apple-darwin15-cc"
+ENV TARGET_CC="/usr/local/osx-ndk-x86/bin/x86_64-apple-darwin15-cc"
 
 COPY Cargo.toml .
 #RUN cargo build --release --target x86_64-apple-darwin
