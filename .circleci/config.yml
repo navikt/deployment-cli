@@ -5,6 +5,8 @@ jobs:
       - image: "circleci/rust:1.33.0"
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Create workspace
           command: mkdir -p /tmp/workspace/target
@@ -32,6 +34,8 @@ jobs:
       - image: "circleci/rust:1.33.0"
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Create workspace
           command: mkdir -p /tmp/workspace/target
@@ -73,7 +77,7 @@ jobs:
           at: /tmp/workspace
       - run:
           name: List workspace files
-          command: tree -d /tmp/workspace
+          command: bash -c "ls /tmp/workspace/**/*"
 
 workflows:
   version: 2
