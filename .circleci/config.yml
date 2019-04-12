@@ -66,6 +66,8 @@ jobs:
       - store_artifacts:
           path: target/x86_64-apple-darwin/release/deployment-cli
   github_release:
+    docker:
+      - image: "circleci/golang:1.8"
     steps:
       - attach_workspace:
           at: /tmp/workspace
