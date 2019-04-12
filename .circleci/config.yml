@@ -63,10 +63,10 @@ jobs:
           command: cargo build --release --target x86_64-apple-darwin
       - run:
           name: Copy build to workspace
-          command: cp -R target/x86_64* /tmp/workspace/
+          command: cp -R target /tmp/workspace/
       - persist_to_workspace:
           root: /tmp/workspace/
-          paths: target
+          paths: target/x86_64*
       - store_artifacts:
           path: target/x86_64-apple-darwin/release/deployment-cli
   github_release:
