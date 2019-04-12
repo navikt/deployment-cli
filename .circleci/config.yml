@@ -81,6 +81,9 @@ jobs:
       - run:
           name: Compress files
           command: |
+            ls /tmp/workspace/
+            ls /tmp/workspace/x86_64-unknown-linux-musl/
+            ls /tmp/workspace/x86_64-unknown-linux-musl/release/
             mkdir artifacts
             cat /tmp/workspace/x86_64-unknown-linux-musl/release/deployment-cli | xz > artifacts/deployment-cli-${CIRCLECI_TAG}-x86_64-unknown-linux-musl.xz
             cat /tmp/workspace/x86_64-apple-darwin/release/deployment-cli | xz > artifacts/deployment-cli-${CIRCLECI_TAG}-x86_64-apple-darwin.xz
