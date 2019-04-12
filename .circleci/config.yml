@@ -97,7 +97,7 @@ jobs:
             chmod +x deployment-cli
       - run:
           name: Create release
-          command: ghr -t $(./deployment-cli token) -u x-access-token -r ${CIRCLECI_PROJECT_REPONAME} -c ${CIRCLECI_SHA1} -delete ${CIRCLECI_TAG} artifacts/
+          command: ghr -t $(./deployment-cli token) -u x-access-token -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} artifacts/
 
 workflows:
   version: 2
