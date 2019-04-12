@@ -26,8 +26,8 @@ jobs:
       - run:
           name: Install required dependencies
           command: |
-            apt update
-            apt install wget git clang
+            sudo apt update
+            sudo apt install wget git clang
       - run:
           name: Install build target
           command: rustup target add x86_64-apple-darwin
@@ -41,7 +41,7 @@ jobs:
             mv MacOSX10.11.sdk.tar.xz tarballs/
             ./build.sh
             mkdir -p /usr/local/osx-ndk-x86
-            mv target/* /usr/local/osx-ndk-x86
+            sudo mv target/* /usr/local/osx-ndk-x86
             mkdir .cargo
             cp .circleci/cargo_config .cargo/config
       - run:
