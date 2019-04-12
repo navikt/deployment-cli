@@ -79,14 +79,17 @@ jobs:
           name: Install ghr
           command: go get github.com/tcnksm/ghr
       - run:
+          name: Install xz
+          command: sudo apt install -y xz-utils
+      - run:
           name: Compress files
           command: |
             ls /tmp/workspace/target/
             ls /tmp/workspace/target/x86_64-unknown-linux-musl/
             ls /tmp/workspace/target/x86_64-unknown-linux-musl/release/
             mkdir artifacts
-            cat /tmp/workspace/target/x86_64-unknown-linux-musl/release/deployment-cli | xz > artifacts/deployment-cli-${CIRCLECI_TAG}-x86_64-unknown-linux-musl.xz
-            cat /tmp/workspace/target/x86_64-apple-darwin/release/deployment-cli | xz > artifacts/deployment-cli-${CIRCLECI_TAG}-x86_64-apple-darwin.xz
+            cat /tmp/workspace/target/x86_64-unknown-linux-musl/release/deployment-cli | lzma > artifacts/deployment-cli-${CIRCLECI_TAG}-x86_64-unknown-linux-musl.xz
+            cat /tmp/workspace/target/x86_64-apple-darwin/release/deployment-cli | lzma > artifacts/deployment-cli-${CIRCLECI_TAG}-x86_64-apple-darwin.xz
       - run:
           name: Download and mark deployment-cli as executable
           command: |
