@@ -21,7 +21,7 @@ jobs:
           command: cargo build --release --target x86_64-unknown-linux-musl
       - run:
           name: Copy build to workspace
-          command: cp -R target/* /tmp/workspace/
+          command: cp -R target /tmp/workspace/
       - persist_to_workspace:
           root: /tmp/workspace/
           paths: target/*
@@ -62,7 +62,7 @@ jobs:
           command: cp -R target/* /tmp/workspace/
       - persist_to_workspace:
           root: /tmp/workspace/
-          paths: target/*
+          paths: target
       - store_artifacts:
           path: target/x86_64-apple-darwin/release/deployment-cli
   github_release:
