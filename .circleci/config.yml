@@ -81,8 +81,8 @@ workflows:
       - macos_build
       - github_release:
           requires:
-            - linux
-            - macos
+            - linux_build
+            - macos_build
 #          filters:
 #            tags:
 #              only: /^v.+/
