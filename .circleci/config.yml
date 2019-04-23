@@ -105,6 +105,8 @@ workflows:
             - linux_build
             - macos_build
           filters:
+            branches:
+              ignore: /.*/
             tags:
               only: /^v.+/
 only: master
