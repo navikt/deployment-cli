@@ -69,6 +69,31 @@ jobs:
           paths: target/x86_64*
       - store_artifacts:
           path: target/x86_64-apple-darwin/release/deployment-cli
+  docker_release:
+    machine: true
+    steps:
+      - setup_remote_docker
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: Copy binary to directory of Dockerfile
+          command: cp /tmp/workspace/target/x86_64-unknown-linux-musl/release/deployment-cli deployment-cli
+      - run:
+          name: Build docker image
+          command: |
+            docker build -t navikt/deployment-cli:${CIRCLE_TAG:-$CIRCLE_SHA1}
+      - run:
+          name: Docker push
+          command: |
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            docker push navikt/deployment-cli:${CIRCLE_TAG:-$CIRCLE_SHA1}
+
+            # Don't push latest on tag builds, only on master builds
+            if [ -z ${CIRCLE_TAG} ]
+            then
+                docker tag navikt/deployment-cli:$CIRCLE_SHA1 navikt/deployment-cli:latest
+                docker push navikt/deployment-cli:latest
+            fi
   github_release:
     docker:
       - image: "circleci/golang:1.8"
@@ -84,16 +109,12 @@ jobs:
       - run:
           name: Compress files
           command: |
-            echo ${CIRCLE_TAG}
-            echo ${CIRCLE_SHA1}
-            echo ${CIRCLE_PROJECT_REPONAME}
             mkdir artifacts
             cat /tmp/workspace/target/x86_64-unknown-linux-musl/release/deployment-cli | lzma > artifacts/deployment-cli-${CIRCLE_TAG}-x86_64-unknown-linux-musl.xz
             cat /tmp/workspace/target/x86_64-apple-darwin/release/deployment-cli | lzma > artifacts/deployment-cli-${CIRCLE_TAG}-x86_64-apple-darwin.xz
       - run:
           name: Create release
           command: ghr -t "$(/tmp/workspace/target/x86_64-unknown-linux-musl/release/deployment-cli token)" -u navikt -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} artifacts/
-
 workflows:
   version: 2
   build_and_release:
@@ -104,6 +125,15 @@ workflows:
               only: /^v.+/
       - macos_build:
           filters:
+            tags:
+              only: /^v.+/
+      - docker_release:
+          requires:
+            - linux_build
+            - macos_build
+          filters:
+            branches:
+              only: master
             tags:
               only: /^v.+/
       - github_release:
