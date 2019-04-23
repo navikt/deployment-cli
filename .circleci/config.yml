@@ -92,7 +92,7 @@ jobs:
             cat /tmp/workspace/target/x86_64-apple-darwin/release/deployment-cli | lzma > artifacts/deployment-cli-${CIRCLECI_TAG}-x86_64-apple-darwin.xz
       - run:
           name: Create release
-          command: ghr -t "$(/tmp/workspace/target/x86_64-unknown-linux-musl/release/deployment-cli token)" -u x-access-token -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} artifacts/
+          command: ghr -t "$(/tmp/workspace/target/x86_64-unknown-linux-musl/release/deployment-cli token)" -u navikt -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} artifacts/
 
 workflows:
   version: 2
