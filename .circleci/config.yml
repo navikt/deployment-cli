@@ -98,8 +98,14 @@ workflows:
   version: 2
   build_and_release:
     jobs:
-      - linux_build
-      - macos_build
+      - linux_build:
+          filters:
+            tags:
+              only: /^v.+/
+      - macos_build:
+          filters:
+            tags:
+              only: /^v.+/
       - github_release:
           requires:
             - linux_build
