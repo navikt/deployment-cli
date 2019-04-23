@@ -81,7 +81,7 @@ jobs:
       - run:
           name: Build docker image
           command: |
-            docker build -t navikt/deployment-cli:${CIRCLE_TAG:-$CIRCLE_SHA1}
+            docker build -t navikt/deployment-cli:${CIRCLE_TAG:-$CIRCLE_SHA1} .
       - run:
           name: Docker push
           command: |
