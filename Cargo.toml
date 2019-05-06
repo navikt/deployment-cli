@@ -1,6 +1,6 @@
 [package]
 name = "deployment-cli"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Kevin Sillerud <kevin.sillerud@gmail.com>"]
 edition = "2018"
 

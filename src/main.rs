@@ -263,22 +263,40 @@ fn handle_deploy_command(subcommand: &ArgMatches) {
 
 fn installation_token_for(subcommand: &ArgMatches, account: &str) -> InstallationToken {
     let app_id = subcommand.value_of("appid").unwrap();
-    let pem = if let Some(app_key) = subcommand.value_of("key") {
-        let mut pem = vec![];
+    let pem = extract_key(subcommand);
+
+
+    fetch_installation_token(app_id, account, pem.as_slice())
+        .expect("Failed to fetch installation token")
+}
+
+fn extract_key(subcommand: &ArgMatches) -> Vec<u8> {
+    let binary = if let Some(app_key) = subcommand.value_of("key") {
+        let mut bytes = vec![];
 
         File::open(app_key)
             .expect("Failed to open github apps key")
-            .read_to_end(&mut pem)
+            .read_to_end(&mut bytes)
             .expect("Failed to read contents of github apps key");
-        pem
+        bytes
     } else {
         let key_base64 = subcommand.value_of("key-base64").unwrap();
         base64::decode(key_base64).expect("Failed to decode base64 pem file")
     };
 
-
-    fetch_installation_token(app_id, account, pem.as_slice())
-        .expect("Failed to fetch installation token")
+    if let Ok(mut key_string) = String::from_utf8(binary.clone()) {
+        if key_string.starts_with("-----BEGIN RSA PRIVATE KEY-----") {
+            let base64 = key_string
+                .replace("\r", "")
+                .replace("\n", "");
+            // Strip header and footer
+            base64::decode(&base64[31..(key_string.len() - 56)]).unwrap()
+        } else {
+            binary
+        }
+    } else {
+        binary
+    }
 }
 
 fn fetch_installation_token(app_id: &str, account: &str, pem: &[u8]) -> Result<InstallationToken, client::ClientError> {
