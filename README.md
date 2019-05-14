@@ -17,10 +17,10 @@ The `--help` flag is available for all subcommands.
 ### Creating a deployment
 Creating a deployment is done using the `deployment-cli deploy create` or  command. It will also do templating using
 handlebars ib the resource files specified with `-r/--resource`. The values used for templating can be specified using
-the config file specified by `-c/--config`. `deployment-cli` will also inject a few values regardless of specifying a
+the config file specified by `-v/--vars`. `deployment-cli` will also inject a few values regardless of specifying a
 config file:
 * ref: git reference. Specified by the `--ref` flag. Default: `master`
-* cluster: which cluster the deploy is for. Specified by the `--cluster/--environment/-e` flag. Default: `dev-fss`
+* cluster: which cluster the deploy is for. Specified by the `--cluster/-c` flag. Default: `dev-fss`
 * team: the team this deployment is for. Specified by the `--team/t` flag.
 * version: the version, this is strictly for templating and should be used to specify which version of the Docker file
 should be pulled. Specified using the `--version` flag
@@ -28,7 +28,7 @@ should be pulled. Specified using the `--version` flag
 
 The most basic deployment should look something like:
                                                                                    
-`deployment-cli create --environment=dev-fss --repository=navikt/deployment -t <team> --version=1.0.0 --appid=1234 --key=/path/to/private-key.pem -r=nais.yaml -c=placeholders.json`
+`deployment-cli create --cluster=dev-fss --repository=navikt/deployment --team=<team> --version=1.0.0 --appid=1234 --key=/path/to/private-key.pem --resource=nais.yaml --vars=placeholders.json`
                                                                                    
 Note: For deployments using github apps the private key has to be pem encoded.
 
