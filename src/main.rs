@@ -41,10 +41,10 @@ fn main() {
             .multiple(true)
             .global(true)
             .takes_value(true))
-        .arg(Arg::with_name("config")
-            .short("c")
-            .long("config")
-            .help("Config to use for templating")
+        .arg(Arg::with_name("variables")
+            .short("v")
+            .long("vars")
+            .help("Path to json file containing additional variables to use when templating")
             .takes_value(true)
             .global(true))
         .arg(Arg::with_name("ref")
@@ -55,10 +55,9 @@ fn main() {
             .global(true)
             .default_value("master"))
         .arg(Arg::with_name("cluster")
+            .short("c")
             .long("cluster")
-            .long("environment")
             .possible_values(ALLOWED_CLUSTERS)
-            .short("e")
             .help("Which cluster to deploy to")
             .takes_value(true)
             .global(true)
@@ -284,7 +283,7 @@ fn extract_key(subcommand: &ArgMatches) -> Vec<u8> {
         base64::decode(key_base64).expect("Failed to decode base64 pem file")
     };
 
-    if let Ok(mut key_string) = String::from_utf8(binary.clone()) {
+    if let Ok(key_string) = String::from_utf8(binary.clone()) {
         if key_string.starts_with("-----BEGIN RSA PRIVATE KEY-----") {
             let base64 = key_string
                 .replace("\r", "")
