@@ -303,11 +303,11 @@ fn await_deploy(subcommand: &ArgMatches, repository: &str, deployment_id: &u64, 
             if let Some(final_status) = client::fetch_status(repository, &deployment_id, username, password)
                 .expect("Failed to fetch statuses for deployments")
                 .iter()
-                .find(|e| FINAL_STATUSES.contains(&e.status.as_str())) {
-                return if OKAY_STATUSES.contains(&final_status.status.as_str()) {
+                .find(|e| FINAL_STATUSES.contains(&e.state.as_str())) {
+                return if OKAY_STATUSES.contains(&final_status.state.as_str()) {
                     Ok(())
                 } else {
-                    Err(final_status.status.clone())
+                    Err(final_status.state.clone())
                 }
             }
             thread::sleep(Duration::from_millis(poll_interval))

@@ -50,5 +50,5 @@ pub struct InstallationToken {
 #[derive(Deserialize, Debug)]
 pub struct DeploymentStatus {
     pub id: u64,
-    pub status: String
+    pub state: String
 }
