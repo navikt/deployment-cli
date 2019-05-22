@@ -46,3 +46,9 @@ pub struct InstallationToken {
     pub token: String,
     pub expires_at: String
 }
+
+#[derive(Deserialize, Debug)]
+pub struct DeploymentStatus {
+    pub id: u64,
+    pub status: String
+}

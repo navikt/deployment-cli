@@ -2,6 +2,7 @@ use reqwest::{Client, Response, RequestBuilder};
 use super::{Repository, InstallationToken, DeploymentRequest};
 use crate::client::ClientError::NotOk;
 use std::io::Read;
+use crate::models::DeploymentStatus;
 
 pub fn fetch_installations(jwt: &str) -> Result<Vec<Repository>, ClientError> {
     let client = Client::new();
@@ -28,6 +29,14 @@ pub fn create_deployment(repo: &str, deployment_payload: &DeploymentRequest, use
         .json(deployment_payload)
         .basic_auth(username, Some(password)))?
         .text()?)
+}
+
+pub fn fetch_status(repo: &str, id: &u64, username: &str, password: &str) -> Result<Vec<DeploymentStatus>, ClientError> {
+    let client = Client::new();
+
+    Ok(execute(client.get(format!("https://api.github.com/repos/{}/deployments/{}/statuses", repo, id).as_str())
+        .basic_auth(username, Some(password)))?
+        .json()?)
 }
 
 fn execute(request_builder: RequestBuilder) -> Result<Response, ClientError> {

@@ -16,7 +16,8 @@ mod models;
 
 use std::fs::File;
 use std::io::Read;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::thread;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use clap::{App, Arg, SubCommand, ArgMatches};
 use handlebars::Handlebars;
@@ -26,6 +27,8 @@ use models::*;
 use jwt::{Header, Algorithm};
 
 const ALLOWED_CLUSTERS: &[&'static str] = &["dev-fss", "dev-sbs", "prod-fss", "prod-sbs"];
+const FINAL_STATUSES: &[&'static str] = &["failure", "error", "success"];
+const OKAY_STATUSES: &[&'static str] = &["success"];
 
 fn main() {
     let matches = App::new("deployment-cli")
@@ -148,6 +151,16 @@ fn main() {
                     .long("repository")
                     .help("Repository to create the deployment request on")
                     .takes_value(true)
+                    .required(true))
+                .arg(Arg::with_name("await")
+                    .long("await")
+                    .help("Await a result in the github status(number of seconds)")
+                    .default_value("180")
+                    .required(true))
+                .arg(Arg::with_name("poll-interval")
+                    .long("poll-interval")
+                    .help("Specifies the interval in ms used for polling while awaiting a github status update")
+                    .default_value("1000")
                     .required(true)))
             .subcommand(SubCommand::with_name("payload")
                 .about("Templates the deployment payload for the github deployment api, useful for manual curl calls/debugging")
@@ -257,8 +270,50 @@ fn handle_deploy_command(subcommand: &ArgMatches) {
 
         let deployment_response = client::create_deployment(repository, &deployment_payload, username, password.as_str())
             .expect("Failed to create deployment");
+
+        let deployment_id = serde_json::from_str::<Value>(deployment_response.as_str())
+            .expect("Unable to parse json response for deployment request")
+            .get("id")
+            .expect("Deployment request response should contain a deployment id")
+            .as_u64()
+            .expect("Invalid format for deployment request id, expected a u64");
+
+        await_deploy(create_command, repository, &deployment_id, username, password.as_str())
+            .expect("Failed waiting for successful deployment status");
+
         println!("{:?}", deployment_response);
     }
+}
+
+fn await_deploy(subcommand: &ArgMatches, repository: &str, deployment_id: &u64, username: &str, password: &str) -> Result<(), String> {
+    let await_seconds = subcommand.value_of("await")
+        .unwrap()
+        .parse::<u64>()
+        .expect("Invalid format for await(needs to be a number)");
+
+    if await_seconds != 0 {
+
+        let poll_interval = subcommand.value_of("poll-interval")
+            .unwrap()
+            .parse::<u64>()
+            .expect("Invalid format for poll-interval(needs to be a number)");
+
+        let start_time = SystemTime::now();
+        while SystemTime::now().duration_since(start_time).unwrap() < Duration::from_secs(await_seconds) {
+            if let Some(final_status) = client::fetch_status(repository, &deployment_id, username, password)
+                .expect("Failed to fetch statuses for deployments")
+                .iter()
+                .find(|e| FINAL_STATUSES.contains(&e.status.as_str())) {
+                return if OKAY_STATUSES.contains(&final_status.status.as_str()) {
+                    Ok(())
+                } else {
+                    Err(final_status.status.clone())
+                }
+            }
+            thread::sleep(Duration::from_millis(poll_interval))
+        }
+    }
+    Err("timed_out".to_owned())
 }
 
 fn installation_token_for(subcommand: &ArgMatches, account: &str) -> InstallationToken {
@@ -284,7 +339,7 @@ fn extract_key(subcommand: &ArgMatches) -> Vec<u8> {
         base64::decode(key_base64).expect("Failed to decode base64 pem file")
     };
 
-    if let Ok(mut key_string) = String::from_utf8(binary.clone()) {
+    if let Ok(key_string) = String::from_utf8(binary.clone()) {
         if key_string.starts_with("-----BEGIN RSA PRIVATE KEY-----") {
             let base64 = key_string
                 .replace("\r", "")
