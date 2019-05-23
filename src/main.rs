@@ -189,7 +189,7 @@ fn handle_token_command(subcommand: &ArgMatches) {
 fn handle_deploy_command(subcommand: &ArgMatches) {
     let reg = Handlebars::new();
 
-    let mut config: Value = if let Some(config_path) = subcommand.value_of("config") {
+    let mut config: Value = if let Some(config_path) = subcommand.value_of("variables") {
         let file = File::open(config_path).expect(format!("Unable to open file {}", config_path).as_str());
         serde_json::from_reader(file).expect("Unable to parse json config")
     } else {
