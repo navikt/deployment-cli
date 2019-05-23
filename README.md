@@ -8,8 +8,9 @@ To see a list of usable commands you can start with using:
 
 `deployment-cli --help`
 
-
 The `--help` flag is available for all subcommands.
+
+To see the help info for a subcommand of a subcommand, type `deployment-cli --help <subcommand> <subsubcommand>` e.g. `deployment-cli --help deploy create`
 
 ## Deployments
 `deployment-cli create` contains a few subcommands for easily creating deployments using the github api
