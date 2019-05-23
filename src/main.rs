@@ -300,10 +300,9 @@ fn await_deploy(subcommand: &ArgMatches, repository: &str, deployment_id: &u64, 
 }
 
 fn get_final_status(statuses: Vec<DeploymentStatus>) -> Option<DeploymentStatus> {
-    let status = statuses
-        .iter()
-        .find(|e| FINAL_STATUSES.contains(&e.state.as_str()));
-    Some(status?.clone())
+    statuses.iter()
+        .find(|e| FINAL_STATUSES.contains(&e.state.as_str()))
+        .cloned()
 }
 
 fn installation_token_for(subcommand: &ArgMatches, account: &str) -> InstallationToken {
