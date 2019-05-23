@@ -3,6 +3,8 @@ extern crate handlebars;
 extern crate base64;
 extern crate clap;
 extern crate jsonwebtoken as jwt;
+#[cfg(test)]
+extern crate mockito;
 extern crate reqwest;
 extern crate serde_json;
 extern crate serde;
@@ -11,7 +13,10 @@ extern crate serde_derive;
 extern crate serde_yaml;
 extern crate rpassword;
 
+
 mod client;
+#[cfg(test)]
+mod main_tests;
 mod models;
 
 use std::fs::File;
@@ -76,38 +81,11 @@ fn main() {
             .help("Version number to be deployed")
             .takes_value(true)
             .global(true))
-
-        .subcommand(SubCommand::with_name("token")
-            .about("Generate github apps token")
-            .arg(Arg::with_name("appid")
-                .short("a")
-                .long("appid")
-                .help("Application ID for github apps")
-                .takes_value(true)
-                .env("GITHUB_APP_ID")
-                .required(true))
-            .arg(Arg::with_name("key")
-                .short("k")
-                .long("key")
-                .help("Private key for github application")
-                .takes_value(true)
-                .env("GITHUB_APP_KEY")
-                .required_unless("key-base64"))
-            .arg(Arg::with_name("key-base64")
-                .long("key-base64")
-                .help("Private key for github applications, base64 encoded PEM")
-                .takes_value(true)
-                .env("GITHUB_APP_KEY_BASE64")
-                .required_unless("key"))
-            .arg(Arg::with_name("account")
-                .long("account")
-                .help("Account for the installation id")
-                .takes_value(true)
-                .env("ACCOUNT")
-                .default_value("navikt")))
+        .subcommand(with_credentials_args(SubCommand::with_name("token")
+            .about("Generate github apps token")))
         .subcommand(SubCommand::with_name("deploy")
             .about("Command for github deployments")
-            .subcommand(SubCommand::with_name("create")
+            .subcommand(with_credentials_args(SubCommand::with_name("create")
                 .about("Create a github deployment")
                 .arg(Arg::with_name("username")
                     .short("u")
@@ -123,29 +101,6 @@ fn main() {
                     .env("DEPLOYMENT_PASSWORD")
                     .group("username-password-auth"))
 
-                // GitHub apps support
-                .arg(Arg::with_name("appid")
-                    .short("a")
-                    .long("appid")
-                    .help("Application ID for github apps")
-                    .takes_value(true)
-                    .env("GITHUB_APP_ID")
-                    .required_unless("username")
-                    .group("github-apps-auth"))
-                .arg(Arg::with_name("key")
-                    .short("k")
-                    .long("key")
-                    .help("Private key for github application")
-                    .takes_value(true)
-                    .env("GITHUB_APP_KEY")
-                    .required_unless_one(&["key-base64", "username"]))
-                .arg(Arg::with_name("key-base64")
-                    .long("key-base64")
-                    .help("Private key for github applications, base64 encoded PEM")
-                    .takes_value(true)
-                    .env("GITHUB_APP_KEY_BASE64")
-                    .required_unless_one(&["key", "username"]))
-
                 .arg(Arg::with_name("repository")
                     .long("repository")
                     .help("Repository to create the deployment request on")
@@ -160,7 +115,7 @@ fn main() {
                     .long("poll-interval")
                     .help("Specifies the interval in ms used for polling while awaiting a github status update")
                     .default_value("1000")
-                    .required(true)))
+                    .required(true))))
             .subcommand(SubCommand::with_name("payload")
                 .about("Templates the deployment payload for the github deployment api, useful for manual curl calls/debugging")
                 .arg(Arg::with_name("outputfile")
@@ -168,7 +123,6 @@ fn main() {
                     .long("outputfile")
                     .help("File to output to, if omitted it will print to stdout")
                     .takes_value(true))))
-
         .get_matches();
 
     if let Some(token_command) = matches.subcommand_matches("token") {
@@ -179,6 +133,36 @@ fn main() {
         handle_deploy_command(deploy_command);
     }
 
+}
+
+fn with_credentials_args<'a, 'b>(app: App<'a, 'b>) -> App<'a, 'b> {
+    app
+        .arg(Arg::with_name("appid")
+            .short("a")
+            .long("appid")
+            .help("Application ID for github apps")
+            .takes_value(true)
+            .env("GITHUB_APP_ID")
+            .required(true))
+        .arg(Arg::with_name("key")
+            .short("k")
+            .long("key")
+            .help("Private key for github application")
+            .takes_value(true)
+            .env("GITHUB_APP_KEY")
+            .required_unless("key-base64"))
+        .arg(Arg::with_name("key-base64")
+            .long("key-base64")
+            .help("Private key for github applications, base64 encoded PEM")
+            .takes_value(true)
+            .env("GITHUB_APP_KEY_BASE64")
+            .required_unless("key"))
+        .arg(Arg::with_name("account")
+            .long("account")
+            .help("Account for the installation id")
+            .takes_value(true)
+            .env("ACCOUNT")
+            .default_value("navikt"))
 }
 
 fn handle_token_command(subcommand: &ArgMatches) {
@@ -299,10 +283,10 @@ fn await_deploy(subcommand: &ArgMatches, repository: &str, deployment_id: &u64, 
 
         let start_time = SystemTime::now();
         while SystemTime::now().duration_since(start_time).unwrap() < Duration::from_secs(await_seconds) {
-            if let Some(final_status) = client::fetch_status(repository, &deployment_id, username, password)
-                .expect("Failed to fetch statuses for deployments")
-                .iter()
-                .find(|e| FINAL_STATUSES.contains(&e.state.as_str())) {
+            let statuses = client::fetch_status(repository, &deployment_id, username, password)
+                .expect("Failed to fetch statuses for deployments");
+
+            if let Some(final_status) = get_final_status(statuses) {
                 return if OKAY_STATUSES.contains(&final_status.state.as_str()) {
                     Ok(())
                 } else {
@@ -313,6 +297,13 @@ fn await_deploy(subcommand: &ArgMatches, repository: &str, deployment_id: &u64, 
         }
     }
     Err("timed_out".to_owned())
+}
+
+fn get_final_status(statuses: Vec<DeploymentStatus>) -> Option<DeploymentStatus> {
+    let status = statuses
+        .iter()
+        .find(|e| FINAL_STATUSES.contains(&e.state.as_str()));
+    Some(status?.clone())
 }
 
 fn installation_token_for(subcommand: &ArgMatches, account: &str) -> InstallationToken {

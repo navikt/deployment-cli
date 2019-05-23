@@ -15,6 +15,7 @@ clap="2"
 jsonwebtoken = {git="https://github.com/Keats/jsonwebtoken", branch="next"}
 rpassword="3.0.1"
 base64="0.10"
+mockito="0.17"
 
 [dependencies.reqwest]
 version="0.9"

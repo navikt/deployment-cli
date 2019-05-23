@@ -4,6 +4,17 @@ use crate::client::ClientError::NotOk;
 use std::io::Read;
 use crate::models::DeploymentStatus;
 
+#[cfg(test)]
+fn github_url() -> String {
+    use mockito;
+    mockito::server_url()
+}
+
+#[cfg(not(test))]
+fn github_url() -> &'static str {
+    "https://api.github.com"
+}
+
 pub fn fetch_installations(jwt: &str) -> Result<Vec<Repository>, ClientError> {
     let client = Client::new();
 
@@ -16,7 +27,7 @@ pub fn fetch_installations(jwt: &str) -> Result<Vec<Repository>, ClientError> {
 pub fn fetch_installation_token(installation_id: &u64, jwt: &str) -> Result<InstallationToken, ClientError> {
     let client = Client::new();
 
-    Ok(execute(client.post(format!("https://api.github.com/app/installations/{}/access_tokens", installation_id).as_str())
+    Ok(execute(client.post(format!("{}/app/installations/{}/access_tokens", github_url(), installation_id).as_str())
         .header("Accept", "application/vnd.github.machine-man-preview+json")
         .bearer_auth(jwt))?
         .json()?)
@@ -25,7 +36,7 @@ pub fn fetch_installation_token(installation_id: &u64, jwt: &str) -> Result<Inst
 pub fn create_deployment(repo: &str, deployment_payload: &DeploymentRequest, username: &str, password: &str) -> Result<String, ClientError> {
     let client = Client::new();
 
-    Ok(execute(client.post(format!("https://api.github.com/repos/{}/deployments", repo).as_str())
+    Ok(execute(client.post(format!("{}/repos/{}/deployments", github_url(), repo).as_str())
         .json(deployment_payload)
         .basic_auth(username, Some(password)))?
         .text()?)
@@ -34,7 +45,7 @@ pub fn create_deployment(repo: &str, deployment_payload: &DeploymentRequest, use
 pub fn fetch_status(repo: &str, id: &u64, username: &str, password: &str) -> Result<Vec<DeploymentStatus>, ClientError> {
     let client = Client::new();
 
-    Ok(execute(client.get(format!("https://api.github.com/repos/{}/deployments/{}/statuses", repo, id).as_str())
+    Ok(execute(client.get(format!("{}/repos/{}/deployments/{}/statuses", github_url(), repo, id).as_str())
         .basic_auth(username, Some(password)))?
         .json()?)
 }
