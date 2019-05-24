@@ -29,7 +29,7 @@ should be pulled. Specified using the `--version` flag
 
 The most basic deployment should look something like:
                                                                                    
-`deployment-cli create --cluster=dev-fss --repository=navikt/deployment --team=<team> --version=1.0.0 --appid=1234 --key=/path/to/private-key.pem --resource=nais.yaml --vars=placeholders.json`
+`deployment-cli deploy create --cluster=dev-fss --repository=navikt/deployment --team=<team> --version=1.0.0 --appid=1234 --key=/path/to/private-key.pem --resource=nais.yaml --vars=placeholders.json`
                                                                                    
 Note: For deployments using github apps the private key has to be pem encoded.
 
