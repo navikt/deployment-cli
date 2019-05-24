@@ -18,7 +18,7 @@ jobs:
       - run:
           name: Install build target
           command: rustup target add x86_64-unknown-linux-musl
-     - run:
+      - run:
           name: Run tests
           command: cargo test --release --target x86_64-unknown-linux-musl
       - run:
