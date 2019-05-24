@@ -13,7 +13,7 @@ To see the help info for a subcommand of a subcommand, type either one of
 * `deployment-cli <subcommand> <subsubcommand> --help` e.g. `deployment-cli deploy create --help`
 
 ## Deployments
-`deployment-cli create` contains a few subcommands for easily creating deployments using the github api
+`deployment-cli deploy` contains a few subcommands for easily creating deployments using the github api
 
 ### Creating a deployment
 Creating a deployment is done using the `deployment-cli deploy create` or  command. It will also do templating using
