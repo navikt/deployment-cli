@@ -13,7 +13,7 @@ macro_rules! assert_ok {
 
 #[test]
 fn test_deploy_payload_write_to_file() {
-    let args = vec!["deployment-cli", "deploy", "payload", "--cluster", "prod-fss", "--team", "plattform", "--version", "1.0.0", "--resource", "nais.yaml", "--outputfile", "target/payload.json"];
+    let args = vec!["deployment-cli", "deploy", "payload", "--cluster", "prod-fss", "--team", "plattform", "--version", "1.0.0", "--resource", "testdata/nais.yaml", "--outputfile", "target/payload.json"];
     let matches = create_cli_app().get_matches_from_safe(args);
 
     let result =  assert_ok!(matches);
@@ -23,7 +23,7 @@ fn test_deploy_payload_write_to_file() {
 
 #[test]
 fn test_deploy_payload_write_to_stdout() {
-    let args = vec!["deployment-cli", "deploy", "payload", "--cluster", "prod-fss", "--team", "plattform", "--version", "1.0.0", "--resource", "nais.yaml"];
+    let args = vec!["deployment-cli", "deploy", "payload", "--cluster", "prod-fss", "--team", "plattform", "--version", "1.0.0", "--resource", "testdata/nais.yaml"];
     let matches = create_cli_app().get_matches_from_safe(args);
 
     let result = assert_ok!(matches);
@@ -42,7 +42,7 @@ fn test_create_deployment() {
         .with_body_from_file("testdata/statuses.json")
         .expect(1)
         .create();
-    let args = vec!["deployment-cli", "deploy", "create", "--cluster", "prod-fss", "--team", "plattform", "--version", "1.0.0", "--resource", "nais.yaml", "--repository", "navikt/testapp", "--username", "testuser", "--password", "testpassword"];
+    let args = vec!["deployment-cli", "deploy", "create", "--cluster", "prod-fss", "--team", "plattform", "--version", "1.0.0", "--resource", "testdata/nais.yaml", "--repository", "navikt/testapp", "--username", "testuser", "--password", "testpassword"];
     let matches = create_cli_app().get_matches_from_safe(args);
 
     let result = assert_ok!(matches);
