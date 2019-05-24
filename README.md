@@ -13,7 +13,7 @@ To see the help info for a subcommand of a subcommand, type either one of
 * `deployment-cli <subcommand> <subsubcommand> --help` e.g. `deployment-cli deploy create --help`
 
 ## Deployments
-`deployment-cli create` contains a few subcommands for easily creating deployments using the github api
+`deployment-cli deploy` contains a few subcommands for easily creating deployments using the github api
 
 ### Creating a deployment
 Creating a deployment is done using the `deployment-cli deploy create` or  command. It will also do templating using
@@ -29,7 +29,7 @@ should be pulled. Specified using the `--version` flag
 
 The most basic deployment should look something like:
                                                                                    
-`deployment-cli create --cluster=dev-fss --repository=navikt/deployment --team=<team> --version=1.0.0 --appid=1234 --key=/path/to/private-key.pem --resource=nais.yaml --vars=placeholders.json`
+`deployment-cli deploy create --cluster=dev-fss --repository=navikt/deployment --team=<team> --version=1.0.0 --appid=1234 --key=/path/to/private-key.pem --resource=nais.yaml --vars=placeholders.json`
                                                                                    
 Note: For deployments using github apps the private key has to be pem encoded.
 
