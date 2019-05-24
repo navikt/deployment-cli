@@ -16,10 +16,12 @@ extern crate rpassword;
 
 mod client;
 #[cfg(test)]
+mod cli_tests;
+#[cfg(test)]
 mod main_tests;
 mod models;
 
-use std::fs::File;
+use std::fs::{OpenOptions, File};
 use std::io::Read;
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
@@ -35,8 +37,8 @@ const ALLOWED_CLUSTERS: &[&'static str] = &["dev-fss", "dev-sbs", "prod-fss", "p
 const FINAL_STATUSES: &[&'static str] = &["failure", "error", "success"];
 const OKAY_STATUSES: &[&'static str] = &["success"];
 
-fn main() {
-    let matches = App::new("deployment-cli")
+fn create_cli_app<'a, 'b>() -> App<'a, 'b> {
+    App::new("deployment-cli")
         .version("0.1")
         .author("Kevin Sillerud<kevin.sillerud@nav.no>")
         .about("Application simplifying deployment through https://github.com/navikt/deployment")
@@ -81,10 +83,19 @@ fn main() {
             .help("Version number to be deployed")
             .takes_value(true)
             .global(true))
+
         .subcommand(with_credentials_args(SubCommand::with_name("token")
-            .about("Generate github apps token")))
+            .about("Generate github apps token")
+            .arg(Arg::with_name("account")
+                .long("account")
+                .help("Account for the installation id")
+                .takes_value(true)
+                .env("ACCOUNT")
+                .default_value("navikt"))))
+
         .subcommand(SubCommand::with_name("deploy")
             .about("Command for github deployments")
+
             .subcommand(with_credentials_args(SubCommand::with_name("create")
                 .about("Create a github deployment")
                 .arg(Arg::with_name("username")
@@ -92,14 +103,13 @@ fn main() {
                     .long("username")
                     .takes_value(true)
                     .env("DEPLOYMENT_USERNAME")
-                    .required_unless("appid")
-                    .group("username-password-auth"))
+                    .required_unless("appid"))
                 .arg(Arg::with_name("password")
                     .short("p")
                     .long("password")
                     .takes_value(true)
                     .env("DEPLOYMENT_PASSWORD")
-                    .group("username-password-auth"))
+                    .requires("username"))
 
                 .arg(Arg::with_name("repository")
                     .long("repository")
@@ -116,6 +126,7 @@ fn main() {
                     .help("Specifies the interval in ms used for polling while awaiting a github status update")
                     .default_value("1000")
                     .required(true))))
+
             .subcommand(SubCommand::with_name("payload")
                 .about("Templates the deployment payload for the github deployment api, useful for manual curl calls/debugging")
                 .arg(Arg::with_name("outputfile")
@@ -123,16 +134,20 @@ fn main() {
                     .long("outputfile")
                     .help("File to output to, if omitted it will print to stdout")
                     .takes_value(true))))
-        .get_matches();
+}
 
-    if let Some(token_command) = matches.subcommand_matches("token") {
+fn main() {
+    execute_command(create_cli_app().get_matches());
+}
+
+fn execute_command(args: ArgMatches) {
+    if let Some(token_command) = args.subcommand_matches("token") {
         handle_token_command(token_command);
     }
 
-    if let Some(deploy_command) = matches.subcommand_matches("deploy") {
+    if let Some(deploy_command) = args.subcommand_matches("deploy") {
         handle_deploy_command(deploy_command);
     }
-
 }
 
 fn with_credentials_args<'a, 'b>(app: App<'a, 'b>) -> App<'a, 'b> {
@@ -143,26 +158,21 @@ fn with_credentials_args<'a, 'b>(app: App<'a, 'b>) -> App<'a, 'b> {
             .help("Application ID for github apps")
             .takes_value(true)
             .env("GITHUB_APP_ID")
-            .required(true))
+            .required_unless("username")
+            .group("github-apps-auth"))
         .arg(Arg::with_name("key")
             .short("k")
             .long("key")
             .help("Private key for github application")
             .takes_value(true)
             .env("GITHUB_APP_KEY")
-            .required_unless("key-base64"))
+            .required_unless_one(&["key-base64", "username"]))
         .arg(Arg::with_name("key-base64")
             .long("key-base64")
             .help("Private key for github applications, base64 encoded PEM")
             .takes_value(true)
             .env("GITHUB_APP_KEY_BASE64")
-            .required_unless("key"))
-        .arg(Arg::with_name("account")
-            .long("account")
-            .help("Account for the installation id")
-            .takes_value(true)
-            .env("ACCOUNT")
-            .default_value("navikt"))
+            .required_unless_one(&["key", "username"]))
 }
 
 fn handle_token_command(subcommand: &ArgMatches) {
@@ -226,8 +236,17 @@ fn handle_deploy_command(subcommand: &ArgMatches) {
         }
     };
 
-    if let Some(_) = subcommand.subcommand_matches("payload") {
-        println!("{}", serde_json::to_string(&deployment_payload).expect("Unable to write deployment request to stdout"))
+    if let Some(payload_subcmd) = subcommand.subcommand_matches("payload") {
+        if let Some(output_file) = payload_subcmd.value_of("outputfile") {
+            let file = OpenOptions::new()
+                .write(true)
+                .create(true)
+                .open(output_file)
+                .expect("Unable to open file");
+            serde_json::to_writer(file, &deployment_payload)
+        } else {
+            serde_json::to_writer(std::io::stdout(), &deployment_payload)
+        }.expect("Failed to serialize json");
     }
 
     if let Some(create_command) = subcommand.subcommand_matches("create") {
@@ -265,7 +284,7 @@ fn handle_deploy_command(subcommand: &ArgMatches) {
             .expect("Failed waiting for successful deployment status");
 
         println!("{:?}", deployment_response);
-    }
+    };
 }
 
 fn await_deploy(subcommand: &ArgMatches, repository: &str, deployment_id: &u64, username: &str, password: &str) -> Result<(), String> {
@@ -295,8 +314,10 @@ fn await_deploy(subcommand: &ArgMatches, repository: &str, deployment_id: &u64, 
             }
             thread::sleep(Duration::from_millis(poll_interval))
         }
+        Err("timed_out".to_owned())
+    } else {
+        Ok(())
     }
-    Err("timed_out".to_owned())
 }
 
 fn get_final_status(statuses: Vec<DeploymentStatus>) -> Option<DeploymentStatus> {

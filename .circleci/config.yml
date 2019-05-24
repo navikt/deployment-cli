@@ -18,6 +18,9 @@ jobs:
       - run:
           name: Install build target
           command: rustup target add x86_64-unknown-linux-musl
+     - run:
+          name: Run tests
+          command: cargo test --release --target x86_64-unknown-linux-musl
       - run:
           name: Build executable
           command: cargo build --release --target x86_64-unknown-linux-musl
@@ -80,8 +83,7 @@ jobs:
           command: cp /tmp/workspace/target/x86_64-unknown-linux-musl/release/deployment-cli deployment-cli
       - run:
           name: Build docker image
-          command: |
-            docker build -t navikt/deployment-cli:${CIRCLE_TAG:-$CIRCLE_SHA1} .
+          command: docker build -t navikt/deployment-cli:${CIRCLE_TAG:-$CIRCLE_SHA1} .
       - run:
           name: Docker push
           command: |
