@@ -31,7 +31,7 @@ The most basic deployment should look something like:
                                                                                    
 `deployment-cli deploy create --cluster=dev-fss --repository=navikt/deployment --team=<team> --version=1.0.0 --appid=1234 --key=/path/to/private-key.pem --resource=nais.yaml --vars=placeholders.json`
                                                                                    
-Note: For deployments using github apps the private key has to be pem encoded.
+Note: For deployments using [Github Apps](https://lab.github.com/githubtraining/getting-started-with-github-apps) the private key has to be [PEM encoded](https://support.quovadisglobal.com/kb/a37/what-is-pem-format.aspx). Use the flag `--key-base64` instead of `--key`.
 
 ### Dumping the payload to stdout
 If you want to just dump the payload to stdout you can do deployment-cli deploy payload with the same flags used in
