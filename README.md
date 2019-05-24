@@ -4,13 +4,13 @@ the github api. Currently it only supports yaml resource files and json config f
 future. Its a companion tool for https://github.com/navikt/deployment
 
 ## General usage
-To see a list of usable commands you can start with using:
-
-`deployment-cli --help`
+To see a list of usable commands you can start with using `deployment-cli --help`.
 
 The `--help` flag is available for all subcommands.
 
-To see the help info for a subcommand of a subcommand, type `deployment-cli --help <subcommand> <subsubcommand>` e.g. `deployment-cli --help deploy create`
+To see the help info for a subcommand of a subcommand, type either one of
+* `deployment-cli --help <subcommand> <subsubcommand>` e.g. `deployment-cli --help deploy create`
+* `deployment-cli <subcommand> <subsubcommand> --help` e.g. `deployment-cli deploy create --help`
 
 ## Deployments
 `deployment-cli create` contains a few subcommands for easily creating deployments using the github api
