@@ -37,7 +37,7 @@ fn main() {
         .arg(Arg::with_name("resource")
             .short("r")
             .long("resource")
-            .help("Kubernetes resource to apply")
+            .help("Kubernetes resource to apply (current only supports YAML files)")
             .multiple(true)
             .global(true)
             .takes_value(true))
