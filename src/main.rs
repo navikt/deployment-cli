@@ -169,7 +169,7 @@ fn with_credentials_args<'a, 'b>(app: App<'a, 'b>) -> App<'a, 'b> {
             .required_unless_one(&["key-base64", "username"]))
         .arg(Arg::with_name("key-base64")
             .long("key-base64")
-            .help("Private key for github applications, base64 encoded PEM")
+            .help("Path to private key for github applications, base64 encoded PEM")
             .takes_value(true)
             .env("GITHUB_APP_KEY_BASE64")
             .required_unless_one(&["key", "username"]))
