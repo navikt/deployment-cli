@@ -1,6 +1,6 @@
 [package]
 name = "deployment-cli"
-version = "0.1.5"
+version = "0.1.6"
 authors = ["Kevin Sillerud <kevin.sillerud@gmail.com>"]
 edition = "2018"
 
@@ -11,8 +11,7 @@ serde_derive="1.0"
 serde_yaml="0.8"
 handlebars="2.0.0-beta.1"
 clap="2"
-# TODO: Move to stable whenever its updated to ring 0.14
-jsonwebtoken = {git="https://github.com/Keats/jsonwebtoken", branch="next"}
+jsonwebtoken="6.0.1"
 rpassword="3.0.1"
 base64="0.10"
 mockito="0.17"

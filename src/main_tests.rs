@@ -1,6 +1,7 @@
 use mockito::mock;
 use super::client::fetch_status;
 use crate::models::DeploymentStatus;
+use crate::{decode_key};
 
 #[test]
 fn test_successful_github_status() {
@@ -33,4 +34,10 @@ fn test_no_final_github_status() {
     assert_eq!(None, super::get_final_status(statuses));
 
     status_mock.assert();
+}
+
+#[test]
+fn test_der_with_windows_newlines() {
+    let key = include_bytes!("../testdata/testkey_windows_newlines");
+    let bytes = decode_key(key.to_vec());
 }

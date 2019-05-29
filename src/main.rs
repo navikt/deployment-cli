@@ -349,13 +349,17 @@ fn extract_key(subcommand: &ArgMatches) -> Vec<u8> {
         base64::decode(key_base64).expect("Failed to decode base64 pem file")
     };
 
-    if let Ok(key_string) = String::from_utf8(binary.clone()) {
+    decode_key(binary)
+}
+
+fn decode_key(binary: Vec<u8>) -> Vec<u8> {
+    if let Ok(key_string) = ::std::str::from_utf8(&binary) {
         if key_string.starts_with("-----BEGIN RSA PRIVATE KEY-----") {
             let base64 = key_string
                 .replace("\r", "")
                 .replace("\n", "");
             // Strip header and footer
-            base64::decode(&base64[31..(key_string.len() - 56)]).unwrap()
+            base64::decode(&base64[31..(base64.len() - 29)]).unwrap()
         } else {
             binary
         }
