@@ -41,5 +41,5 @@ creating a deploy except the ones used for authentication.
 This application also supports dumping github app installation tokens to stdout which can be useful for non-open
 repository cloning or doing the deployment in two stages with `--username x-access-token --password <token>`
 
-## For Windows users
+## For MS Windows users
 If you use this script in the form of the precompiled, binary file: To run the file in Linux - e.g. on Circle CI og Travis CI - it must be executable. If your local developer machine with your local Git repository runs Linux you can make it executable by running the command `chmod +x deployment-cli-v*-x86_64-unknown-linux-musl` before the usual `git commit`. This is not possible on Windows, not even in WSL (Windows Subsystem for Linux) per May 2019. A solution is to run the following command on Windows inside Git Bash or WSL: `git update-index --chmod=+x deployment-cli-v*-x86_64-unknown-linux-musl` and commit.
