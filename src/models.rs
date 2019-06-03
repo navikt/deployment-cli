@@ -22,7 +22,7 @@ pub struct Kubernetes {
     pub resources: Vec<Value>
 }
 
-#[derive(Serialize, Debug, Eq, PartialEq, Clone)]
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Clone)]
 pub struct JwtClaims {
     pub iat: u64,
     pub exp: u64,

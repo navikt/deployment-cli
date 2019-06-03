@@ -37,3 +37,10 @@ spec:
     requests:
       cpu: 50m
       memory: 128Mi
+  {{#if env}}
+  env:
+    {{#each env}}
+    name: '{{@key}}'
+    value: '{{this}}'
+    {{/each}}
+  {{/if}}

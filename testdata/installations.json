@@ -1,0 +1,9 @@
+[
+  {
+    "id": 123,
+    "account": {
+      "id": 1,
+      "login": "navikt"
+    }
+  }
+]

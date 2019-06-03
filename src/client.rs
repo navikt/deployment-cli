@@ -18,7 +18,7 @@ fn github_url() -> &'static str {
 pub fn fetch_installations(jwt: &str) -> Result<Vec<Repository>, ClientError> {
     let client = Client::new();
 
-    Ok(execute(client.get("https://api.github.com/app/installations")
+    Ok(execute(client.get(format!("{}/app/installations", github_url()).as_str())
         .header("Accept", "application/vnd.github.machine-man-preview+json")
         .bearer_auth(jwt))?
         .json()?)
