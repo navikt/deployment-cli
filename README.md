@@ -1,7 +1,9 @@
 # deployment-cli
-Simple utility for templating kubernetes resources, authenticating as a github app and creating a deployment through
-the github api. Currently it only supports yaml resource files and json config files. This will be improved on in the
-future. Its a companion tool for https://github.com/navikt/deployment
+A command line utility for deploying applications to the Nais platform. The primary use case is in the deploy step of a build- and deploy pipeline implemented in a as-a-service product such as Circle CI og Travis CI. Its a companion tool for https://github.com/navikt/deployment It is supposed to be a human-friendly and standardized alternative to bash-scripting with the curl command etc.
+
+Deployment to the Nais Kubernetes is done by creating Github Deployments via the Github API, and the build- and deploy pipeline process will typically authenticate itself by use of a Github App. This CLI helps with that by hiding some stuff from the user.
+
+This CLI provides templating of Kubernetes resources, i.e. configuration of the configuration file nais.yaml. Currently it only supports Kubernetes resource files in the YAML format and properties/config files in the JASON format. This will be improved on in the future.
 
 ## General usage
 To see a list of usable commands you can start with using `deployment-cli --help`.
@@ -13,7 +15,7 @@ To see the help info for a subcommand of a subcommand, type either one of
 * `deployment-cli <subcommand> <subsubcommand> --help` e.g. `deployment-cli deploy create --help`
 
 ## Deployments
-`deployment-cli deploy` contains a few subcommands for easily creating deployments using the github api
+`deployment-cli deploy` contains a few subcommands for easily creating Github Deployments using the Github API:
 
 ### Creating a deployment
 Creating a deployment is done using the `deployment-cli deploy create` or  command. It will also do templating using
