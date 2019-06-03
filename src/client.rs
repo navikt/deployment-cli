@@ -6,7 +6,6 @@ use crate::models::DeploymentStatus;
 
 #[cfg(test)]
 fn github_url() -> String {
-    use mockito;
     mockito::server_url()
 }
 
