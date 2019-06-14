@@ -60,7 +60,7 @@ fn create_cli_app<'a, 'b>() -> App<'a, 'b> {
         .arg(Arg::with_name("ref")
             .short("g")
             .long("ref")
-            .help("Reference used for deployment")
+            .help("Git reference to be deployed. This can be a branch name, a tag name or the SHA checksum of a commit")
             .takes_value(true)
             .global(true)
             .default_value("master"))
