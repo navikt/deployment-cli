@@ -46,7 +46,7 @@ jobs:
           name: Install required dependencies
           command: |
             sudo apt update
-            sudo apt install wget git clang cmake libxar-dev
+            sudo apt install wget git clang cmake
       - run:
           name: Install build target
           command: rustup target add x86_64-apple-darwin
