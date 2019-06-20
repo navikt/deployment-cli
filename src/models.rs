@@ -4,6 +4,7 @@ use serde_json::Value;
 pub struct DeploymentRequest {
     #[serde(rename = "ref")]
     pub git_ref: String,
+    pub auto_merge: bool,
     pub description: String,
     pub environment: String,
     pub payload: Payload,

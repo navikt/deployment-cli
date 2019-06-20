@@ -1,7 +1,7 @@
 use mockito::mock;
 use super::client::fetch_status;
-use crate::models::DeploymentStatus;
-use crate::{decode_private_key, generate_jwt, JwtClaims};
+use super::models::DeploymentStatus;
+use super::{decode_private_key, generate_jwt, JwtClaims};
 
 use jwt;
 

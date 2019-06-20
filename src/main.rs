@@ -83,6 +83,13 @@ fn create_cli_app<'a, 'b>() -> App<'a, 'b> {
             .help("Version number to be deployed")
             .takes_value(true)
             .global(true))
+        .arg(Arg::with_name("auto-merge")
+            .long("auto-merge")
+            .help("Should github try to automatically merge the default branch into ref")
+            .takes_value(true)
+            .default_value("false")
+            .possible_values(&["true", "false"])
+            .global(true))
 
         .subcommand(with_credentials_args(SubCommand::with_name("token")
             .about("Generate github apps token")
@@ -198,6 +205,9 @@ fn handle_deploy_command(subcommand: &ArgMatches) {
 
     let git_ref = subcommand.value_of("ref").unwrap();
     let cluster = subcommand.value_of("cluster").unwrap();
+    let auto_merge: bool = subcommand.value_of("auto-merge").unwrap()
+        .parse()
+        .unwrap();
     let team = subcommand.value_of("team")
         .expect("To create a deployment you need to specify a team");
     let version = subcommand.value_of("version")
@@ -224,6 +234,7 @@ fn handle_deploy_command(subcommand: &ArgMatches) {
 
     let deployment_payload = DeploymentRequest {
         git_ref: git_ref.to_owned(),
+        auto_merge: auto_merge,
         description: format!("Automated deployment request to {}", cluster),
         environment: cluster.to_owned(),
         required_contexts: vec![],
