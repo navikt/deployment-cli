@@ -33,7 +33,7 @@ use serde_json::Value;
 use models::*;
 use jwt::{Header, Algorithm};
 
-const ALLOWED_CLUSTERS: &[&'static str] = &["dev-fss", "dev-sbs", "prod-fss", "prod-sbs"];
+const ALLOWED_CLUSTERS: &[&'static str] = &["dev-fss", "dev-sbs", "prod-fss", "prod-sbs", "staging-gcp", "dev-gcp", "prod-gcp"];
 const FINAL_STATUSES: &[&'static str] = &["failure", "error", "success"];
 const OKAY_STATUSES: &[&'static str] = &["success"];
 
