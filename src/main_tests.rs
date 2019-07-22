@@ -49,7 +49,7 @@ fn test_der_with_windows_newlines() {
 
 #[test]
 fn test_generate_valid_jwt() {
-    let key_bytes = decode_private_key(PRIVATE_KEY.to_vec());
-    let jwt = generate_jwt("abcd", &key_bytes);
+    let key_bytes = decode_private_key(PRIVATE_KEY.to_vec()).unwrap();
+    let jwt = generate_jwt("abcd", &key_bytes).unwrap();
     jwt::decode::<JwtClaims>(&jwt, PUBLIC_KEY_DER, &jwt::Validation::new(jwt::Algorithm::RS256)).unwrap();
 }
