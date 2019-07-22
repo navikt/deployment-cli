@@ -1,6 +1,6 @@
 use mockito::mock;
 use super::client::fetch_status;
-use super::models::DeploymentStatus;
+use super::models::{DeploymentState, DeploymentStatus};
 use super::{decode_private_key, generate_jwt, JwtClaims};
 
 use jwt;
@@ -20,7 +20,8 @@ fn test_successful_github_status() {
 
     assert_eq!(Some(DeploymentStatus{
         id: 1,
-        state: "success".to_owned()
+        target_url: "http://localhost".to_owned(),
+        state: DeploymentState::Success
     }), super::get_final_status(statuses));
 
     status_mock.assert();

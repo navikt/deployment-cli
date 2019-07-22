@@ -20,10 +20,10 @@ jobs:
           command: rustup target add x86_64-unknown-linux-musl
       - run:
           name: Run tests
-          command: cargo test --release --target x86_64-unknown-linux-musl
+          command: cargo test --target x86_64-unknown-linux-musl
       - run:
           name: Build executable
-          command: cargo build --release --target x86_64-unknown-linux-musl
+          command: cargo build --target x86_64-unknown-linux-musl
       - run:
           name: Copy build to workspace
           command: cp -R target /tmp/workspace/
@@ -31,7 +31,7 @@ jobs:
           root: /tmp/workspace/
           paths: target/x86_64*
       - store_artifacts:
-          path: target/x86_64-unknown-linux-musl/release/deployment-cli
+          path: target/x86_64-unknown-linux-musl/debug/deployment-cli
   macos_build:
     docker:
       - image: "circleci/rust:1.33.0"
@@ -63,7 +63,7 @@ jobs:
           environment:
             TARGET_CC: '/usr/local/osx-ndk-x86/bin/x86_64-apple-darwin15-cc'
             PKG_CONFIG_ALLOW_CROSS: '1'
-          command: cargo build --release --target x86_64-apple-darwin
+          command: cargo build --target x86_64-apple-darwin
       - run:
           name: Copy build to workspace
           command: cp -R target /tmp/workspace/
@@ -71,7 +71,7 @@ jobs:
           root: /tmp/workspace/
           paths: target/x86_64*
       - store_artifacts:
-          path: target/x86_64-apple-darwin/release/deployment-cli
+          path: target/x86_64-apple-darwin/debug/deployment-cli
   docker_release:
     machine: true
     steps:
@@ -80,7 +80,7 @@ jobs:
           at: /tmp/workspace
       - run:
           name: Copy binary to directory of Dockerfile
-          command: cp /tmp/workspace/target/x86_64-unknown-linux-musl/release/deployment-cli deployment-cli
+          command: cp /tmp/workspace/target/x86_64-unknown-linux-musl/debug/deployment-cli deployment-cli
       - run:
           name: Build docker image
           command: docker build -t navikt/deployment-cli:${CIRCLE_TAG:-$CIRCLE_SHA1} .
@@ -112,11 +112,11 @@ jobs:
           name: Compress files
           command: |
             mkdir artifacts
-            cat /tmp/workspace/target/x86_64-unknown-linux-musl/release/deployment-cli | lzma > artifacts/deployment-cli-${CIRCLE_TAG}-x86_64-unknown-linux-musl.xz
-            cat /tmp/workspace/target/x86_64-apple-darwin/release/deployment-cli | lzma > artifacts/deployment-cli-${CIRCLE_TAG}-x86_64-apple-darwin.xz
+            cat /tmp/workspace/target/x86_64-unknown-linux-musl/debug/deployment-cli | lzma > artifacts/deployment-cli-${CIRCLE_TAG}-x86_64-unknown-linux-musl.xz
+            cat /tmp/workspace/target/x86_64-apple-darwin/debug/deployment-cli | lzma > artifacts/deployment-cli-${CIRCLE_TAG}-x86_64-apple-darwin.xz
       - run:
           name: Create release
-          command: ghr -t "$(/tmp/workspace/target/x86_64-unknown-linux-musl/release/deployment-cli token)" -u navikt -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} artifacts/
+          command: ghr -t "$(/tmp/workspace/target/x86_64-unknown-linux-musl/debug/deployment-cli token)" -u navikt -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} artifacts/
 workflows:
   version: 2
   build_and_release:

@@ -57,19 +57,21 @@ fn execute(request_builder: RequestBuilder) -> Result<Response, ClientError> {
         if let Err(e) = response.read_to_string(&mut response_text) {
             response_text += format!("{:?}", e).as_str();
         }
-        return Err(NotOk(status.as_u16(), response_text))
+        return Err(NotOk { status_code: status.as_u16(), response: response_text })
     }
     return Ok(response)
 }
 
-#[derive(Debug)]
+#[derive(Fail, Debug)]
 pub enum ClientError {
-    NotOk(u16, String),
-    HttpError(reqwest::Error)
+    #[fail(display = "HTTP call returned unexpected result code {}, response: {}", status_code, response)]
+    NotOk{ status_code: u16, response: String },
+    #[fail(display = "Failed to execute HTTP call {}", error)]
+    HttpError { error: reqwest::Error }
 }
 
 impl From<reqwest::Error> for ClientError {
     fn from(err: reqwest::Error) -> Self {
-        ClientError::HttpError(err)
+        ClientError::HttpError { error: err }
     }
 }
