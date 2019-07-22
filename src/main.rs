@@ -336,9 +336,9 @@ pub struct AwaitFailure {
 impl fmt::Display for AwaitFailure {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self.status.state {
-            DeploymentState::Error => write!(f, "Deploy returned status error, this usually means there is a configuration fault in deployment/deployment-cli. For more information check {}", self.status.target_url),
-            DeploymentState::Failure => write!(f, "Deploy returned status failure, this usually means there is a configuration error in your Kubernetes resource. For more information check {}", self.status.target_url),
-            DeploymentState::TimedOut => write!(f, "deployment-cli timed out waiting for deployment statuses, this usually means your application is failing to start(In a reboot loop or taking too long), check your application logs and the logs from deployment at {}", self.status.target_url),
+            DeploymentState::Error => write!(f, "Deploy returned the status \"error\", this usually means there is a configuration fault in deployment or deployment-cli. For more information check {}", self.status.target_url),
+            DeploymentState::Failure => write!(f, "Deploy returned the status \"failure\", this usually means there is a configuration error in your Kubernetes resource. For more information check {}", self.status.target_url),
+            DeploymentState::TimedOut => write!(f, "deployment-cli timed out waiting for deployment statuses, this usually means your application is failing to start(in a reboot loop or taking too long), check your application logs and the logs from deployment at {}", self.status.target_url),
             _ => write!(f, "Deploy returned an unknown status, for more information check {}", self.status.target_url),
         }
     }
