@@ -1,9 +1,9 @@
-use crate::{create_cli_app, execute_command};
+use crate::cli::{create_cli_app, execute_command};
 use mockito::mock;
 
-const PRIVATE_KEY_B64: &'static str = include_str!("../testdata/testkey_windows_newlines.b64");
-const EXPECTED_PAYLOAD: &'static str = include_str!("../testdata/expected_payload.json");
-const EXPECTED_PAYLOAD_WITH_VARS: &'static str = include_str!("../testdata/expected_payload_with_vars.json");
+const PRIVATE_KEY_B64: &'static str = include_str!("../../../testdata/testkey_windows_newlines.b64");
+const EXPECTED_PAYLOAD: &'static str = include_str!("../../../testdata/expected_payload.json");
+const EXPECTED_PAYLOAD_WITH_VARS: &'static str = include_str!("../../../testdata/expected_payload_with_vars.json");
 
 const JWT_MATCHER: &'static str = "Bearer .+\\..+\\..+";
 
@@ -161,4 +161,3 @@ fn test_create_deployment_github_app_base64_key() {
     deployments_mock.assert();
     status_mock.assert();
 }
-

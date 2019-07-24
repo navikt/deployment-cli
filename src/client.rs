@@ -1,8 +1,7 @@
 use reqwest::{Client, Response, RequestBuilder};
-use super::{Repository, InstallationToken, DeploymentRequest};
+use crate::models::{Repository, InstallationToken, DeploymentRequest, DeploymentStatus};
 use crate::client::ClientError::NotOk;
 use std::io::Read;
-use crate::models::DeploymentStatus;
 
 #[cfg(test)]
 fn github_url() -> String {
@@ -12,6 +11,33 @@ fn github_url() -> String {
 #[cfg(not(test))]
 fn github_url() -> &'static str {
     "https://api.github.com"
+}
+
+#[derive(Fail, Debug)]
+pub enum ClientError {
+    #[fail(display = "HTTP call returned unexpected result code {}, response: {}", status_code, response)]
+    NotOk{ status_code: u16, response: String },
+    #[fail(display = "Failed to execute HTTP call {}", error)]
+    HttpError { error: reqwest::Error }
+}
+
+impl From<reqwest::Error> for ClientError {
+    fn from(err: reqwest::Error) -> Self {
+        ClientError::HttpError { error: err }
+    }
+}
+
+fn execute(request_builder: RequestBuilder) -> Result<Response, ClientError> {
+    let mut response = request_builder.send()?;
+    let status = response.status();
+    if !status.is_success() {
+        let mut response_text = String::new();
+        if let Err(e) = response.read_to_string(&mut response_text) {
+            response_text += format!("{:?}", e).as_str();
+        }
+        return Err(NotOk { status_code: status.as_u16(), response: response_text })
+    }
+    return Ok(response)
 }
 
 pub fn fetch_installations(jwt: &str) -> Result<Vec<Repository>, ClientError> {
@@ -47,31 +73,4 @@ pub fn fetch_status(repo: &str, id: &u64, username: &str, password: &str) -> Res
     Ok(execute(client.get(format!("{}/repos/{}/deployments/{}/statuses", github_url(), repo, id).as_str())
         .basic_auth(username, Some(password)))?
         .json()?)
-}
-
-fn execute(request_builder: RequestBuilder) -> Result<Response, ClientError> {
-    let mut response = request_builder.send()?;
-    let status = response.status();
-    if !status.is_success() {
-        let mut response_text = String::new();
-        if let Err(e) = response.read_to_string(&mut response_text) {
-            response_text += format!("{:?}", e).as_str();
-        }
-        return Err(NotOk { status_code: status.as_u16(), response: response_text })
-    }
-    return Ok(response)
-}
-
-#[derive(Fail, Debug)]
-pub enum ClientError {
-    #[fail(display = "HTTP call returned unexpected result code {}, response: {}", status_code, response)]
-    NotOk{ status_code: u16, response: String },
-    #[fail(display = "Failed to execute HTTP call {}", error)]
-    HttpError { error: reqwest::Error }
-}
-
-impl From<reqwest::Error> for ClientError {
-    fn from(err: reqwest::Error) -> Self {
-        ClientError::HttpError { error: err }
-    }
 }
