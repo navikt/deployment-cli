@@ -2,7 +2,7 @@ version: 2
 jobs:
   linux_build:
     docker:
-      - image: "circleci/rust:1.33.0"
+      - image: "circleci/rust:1.36.0"
     steps:
       - checkout
       - setup_remote_docker:
@@ -34,7 +34,7 @@ jobs:
           path: target/x86_64-unknown-linux-musl/debug/deployment-cli
   macos_build:
     docker:
-      - image: "circleci/rust:1.33.0"
+      - image: "circleci/rust:1.36.0"
     steps:
       - checkout
       - setup_remote_docker:
