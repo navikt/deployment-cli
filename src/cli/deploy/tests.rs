@@ -112,10 +112,10 @@ fn test_create_deployment_with_vars() {
 }
 
 #[test]
-fn test_create_deployment_with_namespace_override() {
+fn test_create_deployment_with_var_overrides() {
     let status_mock = status_mock();
     let deployments_mock = deployment_mock(EXPECTED_PAYLOAD_WITH_VAR_OVERRIDE.trim(), basic_auth());
-    let args = vec!["deployment-cli", "deploy", "create", "--cluster", "prod-fss", "--team", "plattform", "--version", "1.0.0", "--resource", "testdata/nais_with_var_override.yaml", "--repository", "navikt/testapp", "--username", "testuser", "--password", "testpassword", "--var", "namespace=overridden"];
+    let args = vec!["deployment-cli", "deploy", "create", "--cluster", "prod-fss", "--team", "plattform", "--version", "1.0.0", "--resource", "testdata/nais_with_var_override.yaml", "--repository", "navikt/testapp", "--username", "testuser", "--password", "testpassword", "--var", "namespace=overridden", "--var", "name=thisismy=name"];
     let matches = create_cli_app().get_matches_from_safe(args);
 
     let result = assert_ok!(matches);
