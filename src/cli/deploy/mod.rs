@@ -42,6 +42,15 @@ pub fn handle_deploy_command(subcommand: &ArgMatches) -> Result<(), Error> {
     config["cluster"] = Value::String(cluster.to_owned());
     config["team"] = Value::String(team.to_owned());
     config["version"] = Value::String(version.to_owned());
+    if let Some(overrides) = subcommand.values_of("var") {
+        for var in overrides {
+            let equals_index = var.find('=')
+                .ok_or(format_err!("Invalid format for variable override, expected <name>=<value>"))?;
+            let key = &var[0..equals_index];
+            let value = &var[equals_index+1..];
+            config[key] = Value::String(value.to_owned());
+        }
+    }
 
     let resources: Vec<Value> = resource_matches
         .iter()
