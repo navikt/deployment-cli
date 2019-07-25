@@ -103,7 +103,7 @@ pub fn create_cli_app<'a, 'b>() -> App<'a, 'b> {
             .global(true))
         .arg(Arg::with_name("version")
             .long("version")
-            .help("Version number to be deployed")
+            .help("DEPRECATED: Version number to be deployed")
             .takes_value(true)
             .global(true))
         .arg(Arg::with_name("var")

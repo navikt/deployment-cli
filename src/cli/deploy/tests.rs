@@ -19,7 +19,7 @@ macro_rules! assert_ok {
 
 #[test]
 fn test_deploy_payload_write_to_file() {
-    let args = vec!["deployment-cli", "deploy", "payload", "--cluster", "prod-fss", "--team", "plattform", "--version", "1.0.0", "--resource", "testdata/nais.yaml", "--outputfile", "target/payload.json"];
+    let args = vec!["deployment-cli", "deploy", "payload", "--cluster", "prod-fss", "--team", "plattform", "--var", "version=1.0.0", "--resource", "testdata/nais.yaml", "--outputfile", "target/payload.json"];
     let matches = create_cli_app().get_matches_from_safe(args);
 
     let result =  assert_ok!(matches);
@@ -29,7 +29,7 @@ fn test_deploy_payload_write_to_file() {
 
 #[test]
 fn test_deploy_payload_write_to_stdout() {
-    let args = vec!["deployment-cli", "deploy", "payload", "--cluster", "prod-fss", "--team", "plattform", "--version", "1.0.0", "--resource", "testdata/nais.yaml"];
+    let args = vec!["deployment-cli", "deploy", "payload", "--cluster", "prod-fss", "--team", "plattform", "--var", "version=1.0.0", "--resource", "testdata/nais.yaml"];
     let matches = create_cli_app().get_matches_from_safe(args);
 
     let result = assert_ok!(matches);
@@ -39,7 +39,7 @@ fn test_deploy_payload_write_to_stdout() {
 
 #[test]
 fn test_deploy_payload_write_to_file_with_vars() {
-    let args = vec!["deployment-cli", "deploy", "payload", "--cluster", "prod-fss", "--team", "plattform", "--version", "1.0.0", "--resource", "testdata/nais.yaml", "--outputfile", "target/payload_with_vars.json", "--vars", "testdata/vars.json"];
+    let args = vec!["deployment-cli", "deploy", "payload", "--cluster", "prod-fss", "--team", "plattform", "--var", "version=1.0.0", "--resource", "testdata/nais.yaml", "--outputfile", "target/payload_with_vars.json", "--vars", "testdata/vars.json"];
     let matches = create_cli_app().get_matches_from_safe(args);
 
     let result = assert_ok!(matches);
@@ -87,7 +87,7 @@ fn jwt_auth() -> mockito::Matcher { mockito::Matcher::Regex(JWT_MATCHER.to_owned
 fn test_create_deployment() {
     let deployments_mock = deployment_mock(EXPECTED_PAYLOAD.trim(), basic_auth());
     let status_mock = status_mock();
-    let args = vec!["deployment-cli", "deploy", "create", "--cluster", "prod-fss", "--team", "plattform", "--version", "1.0.0", "--resource", "testdata/nais.yaml", "--repository", "navikt/testapp", "--username", "testuser", "--password", "testpassword"];
+    let args = vec!["deployment-cli", "deploy", "create", "--cluster", "prod-fss", "--team", "plattform", "--var", "version=1.0.0", "--resource", "testdata/nais.yaml", "--repository", "navikt/testapp", "--username", "testuser", "--password", "testpassword"];
     let matches = create_cli_app().get_matches_from_safe(args);
 
     let result = assert_ok!(matches);
@@ -101,7 +101,7 @@ fn test_create_deployment() {
 fn test_create_deployment_with_vars() {
     let deployments_mock = deployment_mock(EXPECTED_PAYLOAD_WITH_VARS.trim(), basic_auth());
     let status_mock = status_mock();
-    let args = vec!["deployment-cli", "deploy", "create", "--cluster", "prod-fss", "--team", "plattform", "--version", "1.0.0", "--resource", "testdata/nais.yaml", "--repository", "navikt/testapp", "--username", "testuser", "--password", "testpassword", "--vars", "testdata/vars.json"];
+    let args = vec!["deployment-cli", "deploy", "create", "--cluster", "prod-fss", "--team", "plattform", "--var", "version=1.0.0", "--resource", "testdata/nais.yaml", "--repository", "navikt/testapp", "--username", "testuser", "--password", "testpassword", "--vars", "testdata/vars.json"];
     let matches = create_cli_app().get_matches_from_safe(args);
 
     let result = assert_ok!(matches);
@@ -115,7 +115,21 @@ fn test_create_deployment_with_vars() {
 fn test_create_deployment_with_var_overrides() {
     let status_mock = status_mock();
     let deployments_mock = deployment_mock(EXPECTED_PAYLOAD_WITH_VAR_OVERRIDE.trim(), basic_auth());
-    let args = vec!["deployment-cli", "deploy", "create", "--cluster", "prod-fss", "--team", "plattform", "--version", "1.0.0", "--resource", "testdata/nais_with_var_override.yaml", "--repository", "navikt/testapp", "--username", "testuser", "--password", "testpassword", "--var", "namespace=overridden", "--var", "name=thisismy=name"];
+    let args = vec!["deployment-cli", "deploy", "create", "--cluster", "prod-fss", "--team", "plattform", "--var", "version=1.0.0", "--resource", "testdata/nais_with_var_override.yaml", "--repository", "navikt/testapp", "--username", "testuser", "--password", "testpassword", "--var", "namespace=overridden", "--var", "name=thisismy=name"];
+    let matches = create_cli_app().get_matches_from_safe(args);
+
+    let result = assert_ok!(matches);
+
+    execute_command(result);
+    deployments_mock.assert();
+    status_mock.assert();
+}
+
+#[test]
+fn test_create_deployment_with_deprecated_version_flag() {
+    let deployments_mock = deployment_mock(EXPECTED_PAYLOAD_WITH_VARS.trim(), basic_auth());
+    let status_mock = status_mock();
+    let args = vec!["deployment-cli", "deploy", "create", "--cluster", "prod-fss", "--team", "plattform", "--version", "1.0.0", "--resource", "testdata/nais.yaml", "--repository", "navikt/testapp", "--username", "testuser", "--password", "testpassword", "--vars", "testdata/vars.json"];
     let matches = create_cli_app().get_matches_from_safe(args);
 
     let result = assert_ok!(matches);
@@ -128,7 +142,7 @@ fn test_create_deployment_with_var_overrides() {
 #[test]
 fn test_create_deployment_github_app() {
     println!("{}", PRIVATE_KEY_B64);
-    let args = vec!["deployment-cli", "deploy", "create", "--cluster", "prod-fss", "--team", "plattform", "--version", "1.0.0", "--resource", "testdata/nais.yaml", "--repository", "navikt/testapp", "--appid", "1234", "--key", "testdata/testkey_windows_newlines"];
+    let args = vec!["deployment-cli", "deploy", "create", "--cluster", "prod-fss", "--team", "plattform", "--var", "version=1.0.0", "--resource", "testdata/nais.yaml", "--repository", "navikt/testapp", "--appid", "1234", "--key", "testdata/testkey_windows_newlines"];
     let installations_mock = installations_mock();
     let access_token_mock = access_token_mock();
     let deployments_mock = deployment_mock(EXPECTED_PAYLOAD.trim(), gh_app_auth());
@@ -148,7 +162,7 @@ fn test_create_deployment_github_app() {
 #[test]
 fn test_create_deployment_github_app_base64_key() {
     println!("{}", PRIVATE_KEY_B64);
-    let args = vec!["deployment-cli", "deploy", "create", "--cluster", "prod-fss", "--team", "plattform", "--version", "1.0.0", "--resource", "testdata/nais.yaml", "--repository", "navikt/testapp", "--appid", "1234", "--key-base64", PRIVATE_KEY_B64.trim()];
+    let args = vec!["deployment-cli", "deploy", "create", "--cluster", "prod-fss", "--team", "plattform", "--var", "version=1.0.0", "--resource", "testdata/nais.yaml", "--repository", "navikt/testapp", "--appid", "1234", "--key-base64", PRIVATE_KEY_B64.trim()];
     let installations_mock = installations_mock();
     let access_token_mock = access_token_mock();
     let deployments_mock = deployment_mock(EXPECTED_PAYLOAD.trim(), gh_app_auth());

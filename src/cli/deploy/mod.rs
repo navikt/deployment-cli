@@ -35,13 +35,15 @@ pub fn handle_deploy_command(subcommand: &ArgMatches) -> Result<(), Error> {
         .unwrap();
     let team = subcommand.value_of("team")
         .ok_or(format_err!("To create a deployment you need to specify a team"))?;
-    let version = subcommand.value_of("version")
-        .ok_or(format_err!("To create a deployment you need to specify a version"))?;
 
     config["ref"] = Value::String(git_ref.to_owned());
     config["cluster"] = Value::String(cluster.to_owned());
     config["team"] = Value::String(team.to_owned());
-    config["version"] = Value::String(version.to_owned());
+
+    if let Some(version) = subcommand.value_of("version") {
+        config["version"] = Value::String(version.to_owned());
+    }
+
     if let Some(overrides) = subcommand.values_of("var") {
         for var in overrides {
             let equals_index = var.find('=')

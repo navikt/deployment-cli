@@ -27,13 +27,13 @@ config file:
 * ref: git reference. Specified by the `--ref` flag. Default: `master`
 * cluster: which cluster the deploy is for. Specified by the `--cluster/-c` flag. Default: `dev-fss`
 * team: the team this deployment is for. Specified by the `--team/t` flag.
-* version: the version, this is strictly for templating and should be used to specify which version of the Docker file
+* version: DEPRECATED, use --var version=<version> instead. The version, this is strictly for templating and should be used to specify which version of the Docker file
 should be pulled. Specified using the `--version` flag
 
 
 The most basic deployment should look something like:
                                                                                    
-`deployment-cli deploy create --cluster=dev-fss --repository=navikt/deployment --team=<team> --version=1.0.0 --appid=1234 --key=/path/to/private-key.pem --resource=nais.yaml --vars=placeholders.json`
+`deployment-cli deploy create --cluster=dev-fss --repository=navikt/deployment --team=<team> --var version=1.0.0 --appid=1234 --key=/path/to/private-key.pem --resource=nais.yaml --vars=placeholders.json`
                                                                                    
 Note: For deployments using [Github Apps](https://lab.github.com/githubtraining/getting-started-with-github-apps) the private key has to be [PEM encoded](https://support.quovadisglobal.com/kb/a37/what-is-pem-format.aspx). Use the flag `--key-base64` instead of `--key`.
 
