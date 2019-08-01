@@ -6,26 +6,18 @@ use std::fs::{OpenOptions, File};
 use std::io::Read;
 
 use clap::ArgMatches;
-use failure::{Error, ResultExt};
+use failure::{Error, ResultExt, Fail};
 use handlebars::Handlebars;
 use serde_json::Value;
 
 use crate::models::{DeploymentRequest, Kubernetes, Payload};
 
 pub fn handle_deploy_command(subcommand: &ArgMatches) -> Result<(), Error> {
-    let reg = Handlebars::new();
-
     let mut config: Value = if let Some(config_path) = subcommand.value_of("variables") {
         let file = File::open(config_path).context(format!("Unable to open resource file {}", config_path))?;
         serde_json::from_reader(file).context(format!("Unable to parse json config {}", config_path))?
     } else {
         Value::Null
-    };
-
-    let resource_matches: Vec<&str> = if let Some(values) = subcommand.values_of("resource") {
-        values.collect()
-    } else {
-        vec![]
     };
 
     let git_ref = subcommand.value_of("ref").unwrap();
@@ -54,20 +46,7 @@ pub fn handle_deploy_command(subcommand: &ArgMatches) -> Result<(), Error> {
         }
     }
 
-    let resources: Vec<Value> = resource_matches
-        .iter()
-        .map(|v| File::open(v).expect(format!("Unable to open placeholder file {}", v).as_str()))
-        .map(| mut f| {
-            let mut string = String::new();
-            f.read_to_string(&mut string).expect("Failed to read resource file");
-            string
-        })
-        .map(|s| reg.render_template(s.as_str(), &config)
-            .expect("Failed to render template"))
-        .inspect(|s| println!("{}", s))
-        // TODO: Support json payloads
-        .map(|s| serde_yaml::from_str(s.as_str()).expect("Unable to parse JSON from templated output"))
-        .collect();
+    let resources = get_resources(subcommand, &config);
 
     let deployment_payload = DeploymentRequest {
         git_ref: git_ref.to_owned(),
@@ -79,7 +58,7 @@ pub fn handle_deploy_command(subcommand: &ArgMatches) -> Result<(), Error> {
             version: vec![1, 0, 0],
             team: team.to_owned(),
             kubernetes: Kubernetes {
-                resources: resources
+                resources: resources?
             }
         }
     };
@@ -101,4 +80,36 @@ pub fn handle_deploy_command(subcommand: &ArgMatches) -> Result<(), Error> {
         create::handle_deploy_create_command(create_command, &deployment_payload)?;
     };
     Ok(())
+}
+
+fn get_resources(subcommand: &ArgMatches, config: &Value) -> Result<Vec<Value>, Error> {
+    let reg = Handlebars::new();
+
+    let resource_matches: Vec<&str> = if let Some(values) = subcommand.values_of("resource") {
+        values.collect()
+    } else {
+        vec![]
+    };
+
+    let mut result: Vec<Value> = Vec::new();
+    for file_name in resource_matches {
+        let mut file = File::open(file_name)
+            .context(format!("Unable to open placeholder file {}", file_name))?;
+
+        let mut resource_template = String::new();
+        file.read_to_string(&mut resource_template)
+            .context(format!("Failed to read resource file {}", file_name))?;
+
+        let resource = reg.render_template(resource_template.as_str(), config)
+            .context(format!("Failed to render template for file {}", file_name))?;
+
+        let value: Value = serde_yaml::from_str(resource.as_str()).context(format!("Failed to parse json for {}", file_name))?;
+
+        if let Some(values) = value.as_array() {
+            result.extend_from_slice(values.as_slice());
+        } else {
+            result.push(value);
+        }
+    }
+    Ok(result)
 }
