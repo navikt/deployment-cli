@@ -12,6 +12,10 @@ pub fn execute_command(args: &ArgMatches) -> Result<(), Error> {
         return token::handle_token_command(token_command);
     }
 
+    if let Some(jwt_command) = args.subcommand_matches("jwt") {
+        return token::handle_jwt_command(jwt_command);
+    }
+
     if let Some(deploy_command) = args.subcommand_matches("deploy") {
         return deploy::handle_deploy_command(deploy_command);
     }
@@ -145,6 +149,9 @@ pub fn create_cli_app<'a, 'b>() -> App<'a, 'b> {
                 .takes_value(true)
                 .env("ACCOUNT")
                 .default_value("navikt"))))
+
+        .subcommand(with_credentials_args(SubCommand::with_name("jwt")
+            .about("Generate a app installation jwt")))
 
         .subcommand(SubCommand::with_name("deploy")
             .about("Command for github deployments")

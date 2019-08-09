@@ -18,10 +18,17 @@ pub fn handle_token_command(subcommand: &ArgMatches) -> Result<(), Error> {
     Ok(())
 }
 
+pub fn handle_jwt_command(subcommand: &ArgMatches) -> Result<(), Error> {
+    let app_id = subcommand.value_of("appid").unwrap();
+
+    let key = extract_key(subcommand)?;
+    println!("{}", generate_jwt(app_id, &key)?);
+    Ok(())
+}
+
 pub fn installation_token_for(subcommand: &ArgMatches, account: &str) -> Result<InstallationToken, Error> {
     let app_id = subcommand.value_of("appid").unwrap();
     let pem = extract_key(subcommand);
-
 
     fetch_installation_token(app_id, account, pem?.as_slice())
 }
