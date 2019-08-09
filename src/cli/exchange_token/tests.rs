@@ -2,9 +2,9 @@ use crate::cli::{create_cli_app, execute_command};
 use failure::Error;
 use mockito::mock;
 
-//#[test]
+#[test]
 fn test_exchange_token() {
-    mock("POST", "/api/v1/tokens")
+    let token_mock = mock("POST", "/api/v1/tokens")
         .expect(1)
         .with_status(201)
         .with_body("{}")
@@ -16,4 +16,5 @@ fn test_exchange_token() {
     let result = assert_ok!(matches);
 
     assert_ok!(execute_command(&result));
+    token_mock.assert();
 }

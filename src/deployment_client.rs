@@ -23,7 +23,6 @@ struct TokenRequest<'a> {
 pub fn request_tokens(repository: &str, sources: Vec<&str>, sinks: Vec<&str>, team_name: &str, shared_secret: &str, correlation_id: &str) -> Result<String, ClientError> {
     let client = Client::new();
 
-    println!("{}/api/v1/tokens", request_deployment_token_url());
     Ok(execute(client.post(format!("{}/api/v1/tokens", request_deployment_token_url()).as_str())
         .header("X-Correlation-Id", correlation_id)
         .json(&TokenRequest { repository, sources, sinks })
