@@ -6,7 +6,7 @@ use clap::ArgMatches;
 use failure::{Error, ResultExt};
 use serde_json::Value;
 
-use crate::client;
+use crate::github_client;
 use crate::models::{DeploymentState, DeploymentStatus, DeploymentRequest};
 
 const FINAL_STATUSES: &[DeploymentState] = &[DeploymentState::Failure, DeploymentState::Error, DeploymentState::Success];
@@ -31,9 +31,9 @@ impl fmt::Display for AwaitFailure {
 pub fn handle_deploy_create_command(create_command: &ArgMatches, deployment_payload: &DeploymentRequest) -> Result<(), Error> {
     let repository = create_command.value_of("repository").unwrap();
 
-    let (username, password) = exit_on_err!(credentials(create_command, repository));
+    let (username, password) = credentials(create_command, repository)?;
 
-    let deployment_response = client::create_deployment(repository, deployment_payload, username, password.as_str())
+    let deployment_response = github_client::create_deployment(repository, deployment_payload, username, password.as_str())
         .context("Failed to create deployment")?;
     println!("{:?}", deployment_response);
 
@@ -83,7 +83,7 @@ fn await_deploy(subcommand: &ArgMatches, repository: &str, deployment_id: &u64, 
 
         let start_time = SystemTime::now();
         while SystemTime::now().duration_since(start_time).unwrap() < Duration::from_secs(await_seconds) {
-            let statuses = client::fetch_status(repository, &deployment_id, username, password)
+            let statuses = github_client::fetch_status(repository, &deployment_id, username, password)
                 .context("Failed to fetch statuses for deployment")?;
 
             if let Some(final_status) = get_final_status(statuses) {
@@ -95,7 +95,7 @@ fn await_deploy(subcommand: &ArgMatches, repository: &str, deployment_id: &u64, 
             }
             thread::sleep(Duration::from_millis(poll_interval))
         }
-        let mut last_status = client::fetch_status(repository, &deployment_id, username, password)?
+        let mut last_status = github_client::fetch_status(repository, &deployment_id, username, password)?
             .get(0)
             .cloned()
             .unwrap_or(DeploymentStatus {

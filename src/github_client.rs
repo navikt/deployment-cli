@@ -1,6 +1,6 @@
 use reqwest::{Client, Response, RequestBuilder};
 use crate::models::{Repository, InstallationToken, DeploymentRequest, DeploymentStatus};
-use crate::client::ClientError::NotOk;
+use crate::github_client::ClientError::NotOk;
 use std::io::Read;
 
 #[cfg(test)]
@@ -27,7 +27,7 @@ impl From<reqwest::Error> for ClientError {
     }
 }
 
-fn execute(request_builder: RequestBuilder) -> Result<Response, ClientError> {
+pub fn execute(request_builder: RequestBuilder) -> Result<Response, ClientError> {
     let mut response = request_builder.send()?;
     let status = response.status();
     if !status.is_success() {

@@ -8,15 +8,6 @@ const EXPECTED_PAYLOAD_WITH_VARS: &'static str = include_str!("../../../testdata
 
 const JWT_MATCHER: &'static str = "Bearer .+\\..+\\..+";
 
-macro_rules! assert_ok {
-    ($x:expr) => {
-        {
-            assert!($x.is_ok(), format!("{:?}", $x.unwrap_err()));
-            $x.unwrap()
-        }
-    }
-}
-
 #[test]
 fn test_deploy_payload_write_to_file() {
     let args = vec!["deployment-cli", "deploy", "payload", "--cluster", "prod-fss", "--team", "plattform", "--var", "version=1.0.0", "--resource", "testdata/nais.yaml", "--outputfile", "target/payload.json"];
@@ -24,7 +15,7 @@ fn test_deploy_payload_write_to_file() {
 
     let result =  assert_ok!(matches);
 
-    execute_command(result);
+    assert_ok!(execute_command(&result));
 }
 
 #[test]
@@ -34,7 +25,7 @@ fn test_deploy_payload_write_to_stdout() {
 
     let result = assert_ok!(matches);
 
-    execute_command(result);
+    assert_ok!(execute_command(&result));
 }
 
 #[test]
@@ -44,7 +35,7 @@ fn test_deploy_payload_write_to_file_with_vars() {
 
     let result = assert_ok!(matches);
 
-    execute_command(result);
+    assert_ok!(execute_command(&result));
 }
 
 fn status_mock() -> Mock {
@@ -92,7 +83,7 @@ fn test_create_deployment() {
 
     let result = assert_ok!(matches);
 
-    execute_command(result);
+    assert_ok!(execute_command(&result));
     deployments_mock.assert();
     status_mock.assert();
 }
@@ -106,7 +97,7 @@ fn test_create_deployment_with_vars() {
 
     let result = assert_ok!(matches);
 
-    execute_command(result);
+    assert_ok!(execute_command(&result));
     deployments_mock.assert();
     status_mock.assert();
 }
@@ -120,7 +111,7 @@ fn test_create_deployment_with_var_overrides() {
 
     let result = assert_ok!(matches);
 
-    execute_command(result);
+    assert_ok!(execute_command(&result));
     deployments_mock.assert();
     status_mock.assert();
 }
@@ -134,7 +125,7 @@ fn test_create_deployment_with_deprecated_version_flag() {
 
     let result = assert_ok!(matches);
 
-    execute_command(result);
+    assert_ok!(execute_command(&result));
     deployments_mock.assert();
     status_mock.assert();
 }
@@ -151,7 +142,7 @@ fn test_create_deployment_github_app() {
     let matches = create_cli_app().get_matches_from_safe(args);
 
     let result = assert_ok!(matches);
-    execute_command(result);
+    assert_ok!(execute_command(&result));
 
     installations_mock.assert();
     access_token_mock.assert();
@@ -171,7 +162,7 @@ fn test_create_deployment_github_app_base64_key() {
     let matches = create_cli_app().get_matches_from_safe(args);
 
     let result = assert_ok!(matches);
-    execute_command(result);
+    assert_ok!(execute_command(&result));
 
     installations_mock.assert();
     access_token_mock.assert();

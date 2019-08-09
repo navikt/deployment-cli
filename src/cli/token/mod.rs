@@ -1,4 +1,4 @@
-use crate::client;
+use crate::github_client;
 use crate::models::{JwtClaims, InstallationToken};
 
 use std::fs::File;
@@ -63,14 +63,14 @@ fn decode_private_key(binary: Vec<u8>) -> Result<Vec<u8>, Error> {
 
 fn fetch_installation_token(app_id: &str, account: &str, pem: &[u8]) -> Result<InstallationToken, Error> {
     let jwt = generate_jwt(app_id, pem)?;
-    let installation = client::fetch_installations(jwt.as_str())
+    let installation = github_client::fetch_installations(jwt.as_str())
         .context("Failed to fetch installation token")?;
 
     let installation_id = installation.iter()
         .find(| v | v.account.login.as_str() == account)
         .ok_or(format_err!("Unable to find the account {} in the list of installations. Is the Github app used for authenticating installed on this account?", account))?
         .id;
-    Ok(client::fetch_installation_token(&installation_id, jwt.as_str())?)
+    Ok(github_client::fetch_installation_token(&installation_id, jwt.as_str())?)
 }
 
 fn generate_jwt(application_id: &str, private_key: &[u8]) -> Result<String, Error> {

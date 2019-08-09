@@ -1,35 +1,26 @@
-macro_rules! exit_on_err {
-    ($input:expr) => {
-        match $input {
-            Err(err) => {
-                println!("Error: {}", err.as_fail());
-                for cause in err.iter_causes() {
-                    println!("Caused by:");
-                    println!("{}", cause);
-                }
-                println!("{}", err.backtrace());
-                ::std::process::exit(1);
-            },
-            Ok(value) => value
-        }
-    }
-}
-
 mod deploy;
 pub mod token;
+mod exchange_token;
 
 use clap::{App, Arg, SubCommand, ArgMatches};
+use failure::Error;
 
 const ALLOWED_CLUSTERS: &[&'static str] = &["dev-fss", "dev-sbs", "prod-fss", "prod-sbs", "staging-gcp", "dev-gcp", "prod-gcp"];
 
-pub fn execute_command(args: ArgMatches) {
+pub fn execute_command(args: &ArgMatches) -> Result<(), Error> {
     if let Some(token_command) = args.subcommand_matches("token") {
-        exit_on_err!(token::handle_token_command(token_command));
+        return token::handle_token_command(token_command);
     }
 
     if let Some(deploy_command) = args.subcommand_matches("deploy") {
-        exit_on_err!(deploy::handle_deploy_command(deploy_command));
+        return deploy::handle_deploy_command(deploy_command);
     }
+
+    if let Some(exchange_token_command) = args.subcommand_matches("exchange_token") {
+        return exchange_token::exchange_token_command(exchange_token_command);
+    }
+
+    Err(format_err!("Failed to execute command: Could not match subcommand, this is a bug."))
 }
 
 fn with_credentials_args<'a, 'b>(app: App<'a, 'b>) -> App<'a, 'b> {
@@ -119,6 +110,32 @@ pub fn create_cli_app<'a, 'b>() -> App<'a, 'b> {
             .default_value("false")
             .possible_values(&["true", "false"])
             .global(true))
+
+        .subcommand(SubCommand::with_name("exchange_token")
+            .arg(Arg::with_name("sink")
+                .long("sink")
+                .takes_value(true)
+                .multiple(true)
+                .default_value("github"))
+            .arg(Arg::with_name("src")
+                .long("src")
+                .takes_value(true)
+                .multiple(true)
+                .default_value("github"))
+            .arg(Arg::with_name("repository")
+                .long("repository")
+                .takes_value(true)
+                .required(true))
+            .arg(Arg::with_name("shared-secret")
+                .long("shared-secret")
+                .takes_value(true)
+                .env("SHARED_SECRET")
+                .required(true))
+            .arg(Arg::with_name("correlation-id")
+                .long("correlation-id")
+                .takes_value(true)
+                .required(true)
+                .env("CIRCLE_SHA1")))
 
         .subcommand(with_credentials_args(SubCommand::with_name("token")
             .about("Generate github apps token")

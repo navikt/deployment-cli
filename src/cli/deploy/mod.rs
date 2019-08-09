@@ -6,7 +6,7 @@ use std::fs::{OpenOptions, File};
 use std::io::Read;
 
 use clap::ArgMatches;
-use failure::{Error, ResultExt, Fail};
+use failure::{Error, ResultExt};
 use handlebars::Handlebars;
 use serde_json::Value;
 
