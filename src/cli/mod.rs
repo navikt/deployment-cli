@@ -55,7 +55,7 @@ fn with_credentials_args<'a, 'b>(app: App<'a, 'b>) -> App<'a, 'b> {
             .help("Access/Installation token to deployment API for repository")
             .takes_value(true)
             .env("GITHUB_TOKEN")
-            .required_unless_one(&["key", "username"]))
+            .required_unless_one(&["key", "username", "key-base64"]))
 }
 
 pub fn create_cli_app<'a, 'b>() -> App<'a, 'b> {
