@@ -45,7 +45,7 @@ fn extract_key(subcommand: &ArgMatches) -> Result<Vec<u8>, Error> {
     } else {
         let key_base64 = subcommand.value_of("key-base64").unwrap();
         base64::decode(key_base64)
-            .context("Failed to decode base64 enoded Github app private key")?
+            .context("Failed to decode base64 encoded Github app private key")?
     };
 
     decode_private_key(binary)

@@ -54,7 +54,9 @@ fn credentials<'a>(subcommand: &'a ArgMatches, repository: &str) -> Result<(&'a 
         "x-access-token"
     };
 
-    let password = if let Some(password) = subcommand.value_of("password") {
+    let password = if let Some(token) = subcommand.value_of("token") {
+        token.to_owned()
+    } else if let Some(password) = subcommand.value_of("password") {
         password.to_owned()
     } else if subcommand.is_present("appid") {
         let account = repository.split("/")
@@ -75,7 +77,6 @@ fn await_deploy(subcommand: &ArgMatches, repository: &str, deployment_id: &u64, 
         .context("Provided await value could not be parsed as a number")?;
 
     if await_seconds != 0 {
-
         let poll_interval = subcommand.value_of("poll-interval")
             .unwrap()
             .parse::<u64>()
@@ -91,7 +92,7 @@ fn await_deploy(subcommand: &ArgMatches, repository: &str, deployment_id: &u64, 
                     Ok(())
                 } else {
                     Err(AwaitFailure { status: final_status }.into())
-                }
+                };
             }
             thread::sleep(Duration::from_millis(poll_interval))
         }
@@ -101,10 +102,10 @@ fn await_deploy(subcommand: &ArgMatches, repository: &str, deployment_id: &u64, 
             .unwrap_or(DeploymentStatus {
                 id: 0,
                 state: DeploymentState::TimedOut,
-                target_url: "Unknown".to_owned()
+                target_url: "Unknown".to_owned(),
             });
         last_status.state = DeploymentState::TimedOut;
-        Err(AwaitFailure{ status: last_status }.into())
+        Err(AwaitFailure { status: last_status }.into())
     } else {
         Ok(())
     }
