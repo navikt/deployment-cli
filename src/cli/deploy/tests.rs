@@ -13,7 +13,7 @@ fn test_deploy_payload_write_to_file() {
     let args = vec!["deployment-cli", "deploy", "payload", "--cluster", "prod-fss", "--team", "plattform", "--var", "version=1.0.0", "--resource", "testdata/nais.yaml", "--outputfile", "target/payload.json"];
     let matches = create_cli_app().get_matches_from_safe(args);
 
-    let result =  assert_ok!(matches);
+    let result = assert_ok!(matches);
 
     assert_ok!(execute_command(&result));
 }
@@ -71,7 +71,10 @@ fn access_token_mock() -> Mock {
 }
 
 fn basic_auth() -> &'static str { "Basic dGVzdHVzZXI6dGVzdHBhc3N3b3Jk" }
+
+
 fn gh_app_auth() -> &'static str { "Basic eC1hY2Nlc3MtdG9rZW46YWJjZGU=" }
+fn gh_token_auth() -> &'static str { "Basic eC1hY2Nlc3MtdG9rZW46djEuYWJjNjkxMjM=" }
 fn jwt_auth() -> mockito::Matcher { mockito::Matcher::Regex(JWT_MATCHER.to_owned()) }
 
 #[test]
@@ -166,6 +169,20 @@ fn test_create_deployment_github_app_base64_key() {
 
     installations_mock.assert();
     access_token_mock.assert();
+    deployments_mock.assert();
+    status_mock.assert();
+}
+
+#[test]
+fn test_create_deployment_github_token() {
+    let deployments_mock = deployment_mock(EXPECTED_PAYLOAD.trim(), gh_token_auth());
+    let status_mock = status_mock();
+    let args = vec!["deployment-cli", "deploy", "create", "--cluster", "prod-fss", "--team", "plattform", "--var", "version=1.0.0", "--resource", "testdata/nais.yaml", "--repository", "navikt/testapp", "--token", "v1.abc69123"];
+    let matches = create_cli_app().get_matches_from_safe(args);
+
+    let result = assert_ok!(matches);
+    assert_ok!(execute_command(&result));
+
     deployments_mock.assert();
     status_mock.assert();
 }
