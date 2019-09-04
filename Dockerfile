@@ -5,3 +5,5 @@ RUN apk --no-cache add ca-certificates curl git openssh-client openssl curl dock
 ENV RUST_BACKTRACE=1
 
 COPY deployment-cli /usr/bin/deployment-cli
+
+ENTRYPOINT /usr/bin/deployment-cli
