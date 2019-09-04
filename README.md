@@ -20,8 +20,8 @@ To see the help info for a subcommand of a subcommand, type either one of
 `deployment-cli deploy` contains a few subcommands for easily creating Github Deployments using the Github API:
 
 ### Creating a deployment
-Creating a deployment is done using the `deployment-cli deploy create` or  command. It will also do templating using
-handlebars ib the resource files specified with `-r/--resource`. The values used for templating can be specified using
+Creating a deployment is done using the `deployment-cli deploy create` command. It will also do templating using
+handlebars in the resource files specified with `-r/--resource`. The values used for templating can be specified using
 the config file specified by `-v/--vars`. `deployment-cli` will also inject a few values regardless of specifying a
 config file:
 * ref: git reference. Specified by the `--ref` flag. Default: `master`
@@ -37,10 +37,9 @@ The most basic deployment should look something like:
                                                                                    
 Note: For deployments using [Github Apps](https://lab.github.com/githubtraining/getting-started-with-github-apps) the private key has to be [PEM encoded](https://support.quovadisglobal.com/kb/a37/what-is-pem-format.aspx). Use the flag `--key-base64` instead of `--key`.
 
+## Github Personal Access Token
+If your using access tokens either manually or via Github Actions workflows, you can use the `--token` flag to authenticate.
+
 ### Dumping the payload to stdout
 If you want to just dump the payload to stdout you can do deployment-cli deploy payload with the same flags used in
 creating a deploy except the ones used for authentication.
-
-## Token
-This application also supports dumping github app installation tokens to stdout which can be useful for non-open
-repository cloning or doing the deployment in two stages with `--username x-access-token --password <token>`
