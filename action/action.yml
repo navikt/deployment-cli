@@ -1,0 +1,27 @@
+name: 'NAIS Deploy'
+description: 'Action for deploying to a NAIS-cluster'
+author: '@pig_deployment'
+inputs: 
+  cluster:
+    description: 'Cluster to deploy to'
+    required: true
+  repository:
+    description: 'Respository to create deployment in'
+    required: true
+  team:
+    description: 'Which team this deploy is for'
+    required: true
+  resources:
+    description: 'Path to Kubernetes resources to apply, comma seperated list'
+    default: './nais.yaml'
+  vars:
+    description: 'Path to JSON file containing variables used when executing template'
+  ref:
+    description: 'The commit-reference in deployment, defaults to short commit SHA'
+    default: 'GITHUB_SHA':
+  tag:
+    description: 'Docker image tag for the new release, defaults to short commit SHA'
+    default: 'GITHUB_SHA':
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
