@@ -14,8 +14,8 @@ fi
 		--cluster="$INPUT_CLUSTER" \
 		--team="$INPUT_TEAM" \
 		--repository="$INPUT_REPOSITORY" \
-		--resource="$GITHUB_WORKSPACE"/"$INPUT_RESOURCE" \
-		--vars="$GITHUB_WORKSPACE"/"$INPUT_VARS" \
+#		--resource="$GITHUB_WORKSPACE"/"$INPUT_RESOURCE" \
+#		--vars="$GITHUB_WORKSPACE"/"$INPUT_VARS" \
 		--token="$GITHUB_TOKEN" \
 		--var tag="$INPUT_TAG" \
 		--ref="$INPUT_REF"
