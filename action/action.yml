@@ -5,15 +5,14 @@ inputs:
   cluster:
     description: 'Cluster to deploy to'
     required: true
-  repository:
-    description: 'Respository to create deployment in'
-    required: true
   team:
     description: 'Which team this deploy is for'
     required: true
+  repository:
+    description: 'Respository to create deployment in, defaults to action repository'
   resources:
-    description: 'Path to Kubernetes resources to apply, comma seperated list'
-    default: './nais.yaml'
+    description: 'Path to Kubernetes resources to apply, comma seperated list, defaults to nais.yaml'
+    default: 'nais.yaml'
   vars:
     description: 'Path to JSON file containing variables used when executing template'
   ref:

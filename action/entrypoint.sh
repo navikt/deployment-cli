@@ -19,10 +19,10 @@ fi
 /deployment-cli deploy create \
 		--cluster="$INPUT_CLUSTER" \
 		--team="$INPUT_TEAM" \
-		--repository="$INPUT_REPOSITORY" \
+		--resource="$INPUT_RESOURCE" \
+		--repository="$GITHUB_REPOSITORY" \
 		--token="$GITHUB_TOKEN" \
 		--var image="$INPUT_IMAGE" \
 		--var tag="$INPUT_TAG" \
 		--ref="$INPUT_REF"
-#		--resource="$GITHUB_WORKSPACE"/"$INPUT_RESOURCE" \
 #		--vars="$GITHUB_WORKSPACE"/"$INPUT_VARS" \
