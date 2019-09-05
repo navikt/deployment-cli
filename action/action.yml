@@ -9,7 +9,7 @@ inputs:
     description: 'Which team this deploy is for'
     required: true
   repository:
-    description: 'Respository to create deployment in, defaults to action repository'
+    description: 'Respository to create deployment in, defaults to workflow repository'
   resources:
     description: 'Path to Kubernetes resources to apply, comma seperated list, defaults to nais.yaml'
     default: 'nais.yaml'
