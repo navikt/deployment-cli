@@ -16,13 +16,12 @@ then
     export INPUT_TAG=$(cat .docker_tag)
 fi
 
-/deployment-cli deploy create \
-		--cluster="$INPUT_CLUSTER" \
-		--team="$INPUT_TEAM" \
-		--resource="$INPUT_RESOURCE" \
-		--repository="$GITHUB_REPOSITORY" \
-		--token="$GITHUB_TOKEN" \
-		--var image="$INPUT_IMAGE" \
-		--var tag="$INPUT_TAG" \
-		--ref="$INPUT_REF"
-#		--vars="$GITHUB_WORKSPACE"/"$INPUT_VARS" \
+deployment-cli deploy create \
+	       --cluster="$INPUT_CLUSTER" \
+	       --team="$INPUT_TEAM" \
+	       --resource="$INPUT_RESOURCE" \
+	       --repository="$GITHUB_REPOSITORY" \
+	       --token="$GITHUB_TOKEN" \
+	       --var image="$INPUT_IMAGE" \
+	       --var tag="$INPUT_TAG" \
+	       --ref="$INPUT_REF"
