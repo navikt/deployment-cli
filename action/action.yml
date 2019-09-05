@@ -19,9 +19,12 @@ inputs:
   ref:
     description: 'The commit-reference in deployment, defaults to short commit SHA'
     default: 'GITHUB_SHA'
+  image:
+    description: 'Complete name of Docker image, defaults to file .docker_image'
+    default: 'FROM_FILE'
   tag:
-    description: 'Docker image tag for the new release, defaults to short commit SHA'
-    default: 'GITHUB_SHA'
+    description: 'Docker image tag for the new release, defaults to file .docker_tag'
+    default: 'FROM_FILE'
 runs:
   using: 'docker'
   image: 'Dockerfile'

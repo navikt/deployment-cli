@@ -1,27 +1,27 @@
 #!/bin/sh -l
 
-echo $INPUT_REF
-echo $INPUT_TAG
-cat .docker_tag
-SHORT_SHA=$(echo "$GITHUB_REF" | cut -c -6)
-echo $SHORT_SHA
+SHORT_SHA=$(echo "$GITHUB_SHA" | cut -c -6)
+
 if [ "$INPUT_REF" = "GITHUB_SHA" ]
 then
     export INPUT_REF=$SHORT_SHA
 fi
-if [ "$INPUT_TAG" = "GITHUB_SHA" ]
-then
-    export INPUT_TAG=$SHORT_SHA
-fi
 
-echo $INPUT_REF
-echo $INPUT_TAG
+if [ "$INPUT_IMAGE" = "FROM_FILE" ]
+then
+    export INPUT_IMAGE=$(cat .docker_image)
+fi
+if [ "$INPUT_TAG" = "FROM_FILE" ]
+then
+    export INPUT_TAG=$(cat .docker_tag)
+fi
 
 /deployment-cli deploy create \
 		--cluster="$INPUT_CLUSTER" \
 		--team="$INPUT_TEAM" \
 		--repository="$INPUT_REPOSITORY" \
 		--token="$GITHUB_TOKEN" \
+		--var image="$INPUT_IMAGE" \
 		--var tag="$INPUT_TAG" \
 		--ref="$INPUT_REF"
 #		--resource="$GITHUB_WORKSPACE"/"$INPUT_RESOURCE" \
