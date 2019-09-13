@@ -43,6 +43,16 @@ fn test_deploy_payload_write_to_file_with_vars() {
     assert_ok!(execute_command(&result));
 }
 
+#[test]
+fn invalid_repository_format_result_in_err() {
+    let args = vec!["deployment-cli", "deploy", "create", "--cluster", "prod-fss", "--team", "plattform", "--resource", "testdata/nais.yaml", "--repository", "invalid", "--username", "testuser", "--password", "testpassword"];
+
+    let matches = create_cli_app().get_matches_from_safe(args);
+    let result = assert_ok!(matches);
+
+    assert!(execute_command(&result).is_err(), "Repository without a slash should result in Err");
+}
+
 fn status_mock() -> Mock {
     mock("GET", "/repos/navikt/testapp/deployments/1/statuses")
         .with_body_from_file("testdata/statuses.json")

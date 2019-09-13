@@ -31,6 +31,10 @@ impl fmt::Display for AwaitFailure {
 pub fn handle_deploy_create_command(create_command: &ArgMatches, deployment_payload: &DeploymentRequest) -> Result<(), Error> {
     let repository = create_command.value_of("repository").unwrap();
 
+    if !repository.contains("/") {
+        return Err(format_err!("Repository format should be <user/org>/<repository>, got \"{}\"", repository));
+    }
+
     let (username, password) = credentials(create_command, repository)?;
 
     let deployment_response = github_client::create_deployment(repository, deployment_payload, username, password.as_str())
@@ -61,7 +65,7 @@ fn credentials<'a>(subcommand: &'a ArgMatches, repository: &str) -> Result<(&'a 
     } else if subcommand.is_present("appid") {
         let account = repository.split("/")
             .next()
-            .ok_or(format_err!("Repository format should be <user/org>/<repository>, got {}", repository))?;
+            .ok_or(format_err!("Repository format should be <user/org>/<repository>, got \"{}\"", repository))?;
         crate::cli::token::installation_token_for(subcommand, account)?.token
     } else {
         rpassword::read_password_from_tty(Some("Please enter github password: "))?
