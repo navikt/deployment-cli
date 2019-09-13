@@ -1,0 +1,39 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: testapp
+  namespace: default
+  labels:
+    team: "{{team}}"
+spec:
+  image: "navikt/testapp:{{version}}"
+  port: 8080
+  replicas:
+    min: 1
+    max: 4
+    cpuThresholdPercentage: 70
+  liveness:
+    path: /is_alive
+    timeout: 1
+    initialDelay: 5
+    periodSeconds: 5
+    failureThreshold: 30
+  readiness:
+    path: /is_alive
+    timeout: 1
+    initialDelay: 5
+    periodSeconds: 5
+    failureThreshold: 30
+  leaderElection: false
+  prometheus:
+    enabled: true
+    path: /prometheus
+  istio:
+    enabled: false
+  resources:
+    limits:
+      cpu: 400m
+      memory: 512Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi

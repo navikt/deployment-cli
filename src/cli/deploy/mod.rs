@@ -91,6 +91,12 @@ fn get_resources(subcommand: &ArgMatches, config: &Value) -> Result<Vec<Value>, 
         vec![]
     };
 
+    let raw_resource_matches: Vec<&str> = if let Some(values) = subcommand.values_of("raw-resource") {
+        values.collect()
+    } else {
+        vec![]
+    };
+
     let mut result: Vec<Value> = Vec::new();
     for file_name in resource_matches {
         let mut file = File::open(file_name)
@@ -110,6 +116,13 @@ fn get_resources(subcommand: &ArgMatches, config: &Value) -> Result<Vec<Value>, 
         } else {
             result.push(value);
         }
+    }
+
+    for file_name in raw_resource_matches {
+        let file = File::open(file_name)?;
+
+        let value: Value = serde_yaml::from_reader(&file)?;
+        result.push(value)
     }
     Ok(result)
 }
