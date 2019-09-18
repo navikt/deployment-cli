@@ -83,7 +83,7 @@ jobs:
           command: cp /tmp/workspace/target/x86_64-unknown-linux-musl/debug/deployment-cli deployment-cli
       - run:
           name: Build docker image
-          command: docker build -t navikt/deployment-cli:${$CIRCLE_SHA1} .
+          command: docker build -t navikt/deployment-cli:$CIRCLE_SHA1 .
       - run:
           name: Docker push
           command: |
