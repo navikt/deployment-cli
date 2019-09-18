@@ -139,7 +139,7 @@ workflows:
             branches:
               only: master
             tags:
-              only: /^v.+/
+              only: /^cli-.+/
       - github_release:
           requires:
             - linux_build
@@ -148,5 +148,5 @@ workflows:
             branches:
               ignore: /.*/
             tags:
-              only: /^v.+/
+              only: /^cli-.+/
 only: master
