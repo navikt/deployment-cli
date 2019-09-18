@@ -92,7 +92,7 @@ jobs:
                 VERSION="$(printf "$CIRCLE_TAG" | cut -c 5-)"
                 docker tag navikt/deployment-cli:${$CIRCLE_SHA1} navikt/deployment-cli:$VERSION
                 docker push navikt/deployment-cli:$VERSION
-            elif
+            else
                 docker tag navikt/deployment-cli:$CIRCLE_SHA1 navikt/deployment-cli:latest
                 docker push navikt/deployment-cli:$CIRCLE_SHA1
                 docker push navikt:deployment-cli:latest
