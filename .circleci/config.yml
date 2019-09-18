@@ -88,11 +88,13 @@ jobs:
           name: Docker push
           command: |
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-            if [ "${CIRCLE_TAG}" ]; then
+            if [ -n "${CIRCLE_TAG}" ]; then
                 VERSION="$(printf "$CIRCLE_TAG" | cut -c 5-)"
+                echo $VERSION
                 docker tag navikt/deployment-cli:$CIRCLE_SHA1 navikt/deployment-cli:$VERSION
                 docker push navikt/deployment-cli:$VERSION
             else
+                echo $CIRCLE_SHA1
                 docker tag navikt/deployment-cli:$CIRCLE_SHA1 navikt/deployment-cli:latest
                 docker push navikt/deployment-cli:$CIRCLE_SHA1
                 docker push navikt:deployment-cli:latest
