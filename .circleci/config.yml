@@ -83,18 +83,19 @@ jobs:
           command: cp /tmp/workspace/target/x86_64-unknown-linux-musl/debug/deployment-cli deployment-cli
       - run:
           name: Build docker image
-          command: docker build -t navikt/deployment-cli:${CIRCLE_TAG:-$CIRCLE_SHA1} .
+          command: docker build -t navikt/deployment-cli:${$CIRCLE_SHA1} .
       - run:
           name: Docker push
           command: |
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-            docker push navikt/deployment-cli:${CIRCLE_TAG:-$CIRCLE_SHA1}
-
-            # Don't push latest on tag builds, only on master builds
-            if [ -z ${CIRCLE_TAG} ]
-            then
+            if [ "${CIRCLE_TAG}" ]; then
+                VERSION="$(printf "$CIRCLE_TAG" | cut -c 5-)"
+                docker tag navikt/deployment-cli:${$CIRCLE_SHA1} navikt/deployment-cli:$VERSION
+                docker push navikt/deployment-cli:$VERSION
+            elif
                 docker tag navikt/deployment-cli:$CIRCLE_SHA1 navikt/deployment-cli:latest
-                docker push navikt/deployment-cli:latest
+                docker push navikt/deployment-cli:$CIRCLE_SHA1
+                docker push navikt:deployment-cli:latest
             fi
   github_release:
     docker:
@@ -112,11 +113,12 @@ jobs:
           name: Compress files
           command: |
             mkdir artifacts
-            cat /tmp/workspace/target/x86_64-unknown-linux-musl/debug/deployment-cli | lzma > artifacts/deployment-cli-${CIRCLE_TAG}-x86_64-unknown-linux-musl.xz
-            cat /tmp/workspace/target/x86_64-apple-darwin/release/deployment-cli | lzma > artifacts/deployment-cli-${CIRCLE_TAG}-x86_64-apple-darwin.xz
+            VERSION="$(printf "$CIRCLE_TAG" | cut -c 5-)"
+            cat /tmp/workspace/target/x86_64-unknown-linux-musl/debug/deployment-cli | lzma > artifacts/deployment-cli-$VERSION-x86_64-unknown-linux-musl.xz
+            cat /tmp/workspace/target/x86_64-apple-darwin/release/deployment-cli | lzma > artifacts/deployment-cli-$VERSION-x86_64-apple-darwin.xz
       - run:
           name: Create release
-          command: ghr -t "$(/tmp/workspace/target/x86_64-unknown-linux-musl/debug/deployment-cli token)" -u navikt -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} artifacts/
+          command: ghr -t "$(/tmp/workspace/target/x86_64-unknown-linux-musl/debug/deployment-cli token)" -u navikt -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_SHA1} artifacts/
 workflows:
   version: 2
   build_and_release:
@@ -124,11 +126,11 @@ workflows:
       - linux_build:
           filters:
             tags:
-              only: /^v.+/
+              only: /^cli-.+/
       - macos_build:
           filters:
             tags:
-              only: /^v.+/
+              only: /^cli-.+/
       - docker_release:
           requires:
             - linux_build
