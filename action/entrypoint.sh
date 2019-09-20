@@ -24,7 +24,7 @@ fi
 deployment-cli deploy create \
 	       --cluster="$INPUT_CLUSTER" \
 	       --team="$INPUT_TEAM" \
-	       --resource="$INPUT_RESOURCE" \
+	       --resource="$INPUT_RESOURCES" \
 	       --repository="$GITHUB_REPOSITORY" \
 	       --token="$GITHUB_TOKEN" \
 	       --var image="$INPUT_IMAGE" \
