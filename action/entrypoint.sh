@@ -17,7 +17,7 @@ then
 fi
 if [ -z "$INPUT_VARS" ]
 then
-    touch .empty
+    echo "{}" > .empty
     export INPUT_VARS=".empty"
 fi
 
