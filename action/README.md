@@ -24,4 +24,4 @@ jobs:
 
 ## Examples and documentation
 
-Examples and more documentation can be found in [nais/doc/deploy](https://github.com/nais/doc/tree/master/content/deploy#using-github-actions).
+Examples and more documentation can be found in [doc.nais.io/deploy](https://doc.nais.io/deploy#using-github-actions).
