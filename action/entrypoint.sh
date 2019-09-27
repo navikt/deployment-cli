@@ -22,7 +22,7 @@ then
     export INPUT_VARS=".empty"
 fi
 
-if [ -z "$INPUT_RESOURCES" ] && [ -z "$INPUT_RAWRESOUCES" ]
+if [ -z "$INPUT_RESOURCES" ] && [ -z "$INPUT_RAWRESOURCES" ]
 then
     deployment-cli deploy create \
         --cluster="$INPUT_CLUSTER" \
