@@ -38,7 +38,7 @@ fi
 deployment-cli deploy create \
     --cluster="$INPUT_CLUSTER" \
     --team="$INPUT_TEAM" \
-    --resource="$INPUT_RESOURCES"
+    --resource="$INPUT_RESOURCES" \
     --raw-resource="$INPUT_RAWRESOURCES" \
     --repository="$GITHUB_REPOSITORY" \
     --token="$GITHUB_TOKEN" \
