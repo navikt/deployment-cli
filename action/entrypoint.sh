@@ -21,27 +21,52 @@ if [ -z "$INPUT_VARS" ]
 then
     export INPUT_VARS=".empty"
 fi
-if [ -z "$INPUT_RESOURCES" ]
-then
-    export INPUT_RESOURCES=".empty"
-fi
-if [ -z "$INPUT_RAWRESOURCES" ]
-then
-    export INPUT_RAWRESOURCES=".empty"
-fi
+
 if [ -z "$INPUT_RESOURCES" ] && [ -z "$INPUT_RAWRESOUCES" ]
 then
-    export INPUT_RESOURCES="nais.yaml"
-fi
-
-deployment-cli deploy create \
-    --cluster="$INPUT_CLUSTER" \
-    --team="$INPUT_TEAM" \
-    --resource="$INPUT_RESOURCES" \
-    --raw-resource="$INPUT_RAWRESOURCES" \
-    --repository="$GITHUB_REPOSITORY" \
-    --token="$GITHUB_TOKEN" \
-    --var image="$INPUT_IMAGE" \
-    --var tag="$INPUT_TAG" \
-    --ref="$INPUT_REF" \
-    --vars="$INPUT_VARS"
+    deployment-cli deploy create \
+        --cluster="$INPUT_CLUSTER" \
+        --team="$INPUT_TEAM" \
+        --resource="nais.yaml" \
+        --repository="$GITHUB_REPOSITORY" \
+        --token="$GITHUB_TOKEN" \
+        --var image="$INPUT_IMAGE" \
+        --var tag="$INPUT_TAG" \
+        --ref="$INPUT_REF" \
+        --vars="$INPUT_VARS"
+elif [ -z "$INPUT_RESOURCES" ]
+then
+    deployment-cli deploy create \
+        --cluster="$INPUT_CLUSTER" \
+        --team="$INPUT_TEAM" \
+        --raw-resource="$INPUT_RAWRESOURCES"
+        --repository="$GITHUB_REPOSITORY" \
+        --token="$GITHUB_TOKEN" \
+        --var image="$INPUT_IMAGE" \
+        --var tag="$INPUT_TAG" \
+        --ref="$INPUT_REF" \
+        --vars="$INPUT_VARS"
+if [ -z "$INPUT_RAWRESOURCES" ]
+then
+    deployment-cli deploy create \
+        --cluster="$INPUT_CLUSTER" \
+        --team="$INPUT_TEAM" \
+        --resource="$INPUT_RESOURCES" \
+        --repository="$GITHUB_REPOSITORY" \
+        --token="$GITHUB_TOKEN" \
+        --var image="$INPUT_IMAGE" \
+        --var tag="$INPUT_TAG" \
+        --ref="$INPUT_REF" \
+        --vars="$INPUT_VARS"
+else
+    deployment-cli deploy create \
+        --cluster="$INPUT_CLUSTER" \
+        --team="$INPUT_TEAM" \
+        --resource="$INPUT_RESOURCES"
+        --raw-resource="$INPUT_RAWRESOURCES"
+        --repository="$GITHUB_REPOSITORY" \
+        --token="$GITHUB_TOKEN" \
+        --var image="$INPUT_IMAGE" \
+        --var tag="$INPUT_TAG" \
+        --ref="$INPUT_REF" \
+        --vars="$INPUT_VARS"
