@@ -22,6 +22,7 @@ then
 fi
 if [ -z "$INPUT_RAWRESOURCES" ] && [ -z "$INPUT_RESOURCES" ]
 then
+    echo "Defaulting to --resource=nais.yaml"
     deployment-cli deploy create \
 	      --cluster="$INPUT_CLUSTER" \
 	      --team="$INPUT_TEAM" \
@@ -34,6 +35,7 @@ then
 	      --vars="$INPUT_VARS"
 elif [ -z "$INPUT_RAWRESOURCES" ] # use resources if rawresources is not set
 then
+    echo "Using provided resource $INPUT_RESOURCES"
     deployment-cli deploy create \
         --cluster="$INPUT_CLUSTER" \
         --team="$INPUT_TEAM" \
@@ -46,6 +48,7 @@ then
         --vars="$INPUT_VARS"
 elif [ -z "$INPUT_RESOURCES" ] # use rawresources if resources is not set
 then
+    echo "Using provided raw resources $INPUT_RAWRESOURCES"
     deployment-cli deploy create \
         --cluster="$INPUT_CLUSTER" \
         --team="$INPUT_TEAM" \
@@ -57,6 +60,7 @@ then
         --ref="$INPUT_REF" \
         --vars="$INPUT_VARS"
 else                           # use both fields if they are set
+    echo "Using both raw resources $INPUT_RAWRESOUCES and resources $INPUT_RESOURCES" 
     deployment-cli deploy create \
         --cluster="$INPUT_CLUSTER" \
         --team="$INPUT_TEAM" \
