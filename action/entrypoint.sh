@@ -1,7 +1,6 @@
 #!/bin/sh -l
 
 SHORT_SHA=$(echo "$GITHUB_SHA" | cut -c -6)
-echo "{}" > .empty
 
 
 if [ "$INPUT_REF" = "GITHUB_SHA" ]
@@ -19,6 +18,7 @@ then
 fi
 if [ -z "$INPUT_VARS" ]
 then
+    echo "{}" > .empty
     export INPUT_VARS=".empty"
 fi
 
