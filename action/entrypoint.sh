@@ -1,8 +1,7 @@
 #!/bin/sh -l
 
 SHORT_SHA=$(echo "$GITHUB_SHA" | cut -c -6)
-touch .empty
-echo "{}" > .empty.json
+echo "{}" > .empty
 
 
 if [ "$INPUT_REF" = "GITHUB_SHA" ]
@@ -20,7 +19,7 @@ then
 fi
 if [ -z "$INPUT_VARS" ]
 then
-    export INPUT_VARS=".empty.json"
+    export INPUT_VARS=".empty"
 fi
 if [ -z "$INPUT_RESOURCES" ]
 then
