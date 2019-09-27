@@ -70,3 +70,4 @@ else
         --var tag="$INPUT_TAG" \
         --ref="$INPUT_REF" \
         --vars="$INPUT_VARS"
+fi
