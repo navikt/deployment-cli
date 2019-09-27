@@ -1,7 +1,7 @@
 name: 'NAIS Deploy'
 description: 'Action for deploying to a NAIS-cluster'
 author: '@pig_deployment'
-inputs: 
+inputs:
   cluster:
     description: 'Cluster to deploy to'
     required: true
@@ -12,7 +12,8 @@ inputs:
     description: 'Respository to create deployment in, defaults to workflow repository'
   resources:
     description: 'Path to Kubernetes resources to apply, comma seperated list, defaults to nais.yaml'
-    default: 'nais.yaml'
+  rawresources:
+    description: 'Path to Kubernetes resources to apply, which do not require templating'
   ref:
     description: 'The commit-reference in deployment, defaults to short commit SHA'
     default: 'GITHUB_SHA'

@@ -1,4 +1,4 @@
-FROM navikt/deployment-cli:v0.3.0
+FROM navikt/deployment-cli:cli-0.4.0
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
