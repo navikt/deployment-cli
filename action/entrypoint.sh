@@ -33,6 +33,7 @@ then
 	      --ref="$INPUT_REF" \
 	      --vars="$INPUT_VARS"
 elif [ -z "$INPUT_RAWRESOURCES" ] # use resources if rawresources is not set
+then
     deployment-cli deploy create \
         --cluster="$INPUT_CLUSTER" \
         --team="$INPUT_TEAM" \
@@ -44,6 +45,7 @@ elif [ -z "$INPUT_RAWRESOURCES" ] # use resources if rawresources is not set
         --ref="$INPUT_REF" \
         --vars="$INPUT_VARS"
 elif [ -z "$INPUT_RESOURCES" ] # use rawresources if resources is not set
+then
     deployment-cli deploy create \
         --cluster="$INPUT_CLUSTER" \
         --team="$INPUT_TEAM" \
