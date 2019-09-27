@@ -46,7 +46,7 @@ then
         --var tag="$INPUT_TAG" \
         --ref="$INPUT_REF" \
         --vars="$INPUT_VARS"
-if [ -z "$INPUT_RAWRESOURCES" ]
+elif [ -z "$INPUT_RAWRESOURCES" ]
 then
     deployment-cli deploy create \
         --cluster="$INPUT_CLUSTER" \
