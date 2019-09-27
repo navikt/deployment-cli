@@ -30,7 +30,7 @@ if [ -z "$INPUT_RAWRESOURCES" ]
 then
     export INPUT_RAWRESOURCES=".empty"
 fi
-if [ -z "$INPUT_RESOURCES"] && [ -z "$INPUT_RAWRESOUCES"]
+if [ -z "$INPUT_RESOURCES" ] && [ -z "$INPUT_RAWRESOUCES" ]
 then
     export INPUT_RESOURCES="nais.yaml"
 fi
