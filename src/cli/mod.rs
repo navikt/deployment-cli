@@ -190,6 +190,7 @@ pub fn create_cli_app<'a, 'b>() -> App<'a, 'b> {
                     .required(true))
                 .arg(Arg::with_name("await")
                     .long("await")
+                    .env("AWAIT_SECONDS")
                     .help("Await a result in the github status(number of seconds)")
                     .default_value("180")
                     .required(true))
