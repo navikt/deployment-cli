@@ -11,7 +11,7 @@ inputs:
   repository:
     description: 'Respository to create deployment in, defaults to workflow repository'
   resources:
-    description: 'Path to Kubernetes resources to apply, comma seperated list, defaults to nais.yaml'
+    description: 'Path to Kubernetes resources to apply, comma seperated list'
   rawresources:
     description: 'Path to Kubernetes resources to apply, which do not require templating, comma seperated list'
   ref:
