@@ -24,12 +24,9 @@ Creating a deployment is done using the `deployment-cli deploy create` command. 
 handlebars in the resource files specified with `-r/--resource`. The values used for templating can be specified using
 the config file specified by `-v/--vars`. `deployment-cli` will also inject a few values regardless of specifying a
 config file:
-* ref: git reference. Specified by the `--ref` flag. Default: `master`
-* cluster: which cluster the deploy is for. Specified by the `--cluster/-c` flag. Default: `dev-fss`
-* team: the team this deployment is for. Specified by the `--team/t` flag.
-* version: DEPRECATED, use --var version=<version> instead. The version, this is strictly for templating and should be used to specify which version of the Docker file
-should be pulled. Specified using the `--version` flag
-
+* ref: Git reference, i.e. branch name, tag name or commit SHA. Specified by the `--ref` flag. Default: `master`
+* cluster: which Nais Kubernetes cluster the deploy is for. Specified by the `--cluster/-c` flag. Default: `dev-fss`
+* team: the Github team this deployment is for. Specified by the `--team/t` flag.
 
 The most basic deployment should look something like:
                                                                                    
@@ -43,3 +40,7 @@ If your using access tokens either manually or via Github Actions workflows, you
 ### Dumping the payload to stdout
 If you want to just dump the payload to stdout you can do deployment-cli deploy payload with the same flags used in
 creating a deploy except the ones used for authentication.
+
+## Token
+This application also supports dumping Github App installation tokens to stdout which can be useful for non-open
+repository cloning or doing the deployment in two stages with `--username x-access-token --password <token>`
