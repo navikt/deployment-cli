@@ -2,7 +2,7 @@ version: 2
 jobs:
   linux_build:
     docker:
-      - image: "circleci/rust:1.33.0"
+      - image: "circleci/rust:1.36.0"
     steps:
       - checkout
       - setup_remote_docker:
@@ -20,10 +20,10 @@ jobs:
           command: rustup target add x86_64-unknown-linux-musl
       - run:
           name: Run tests
-          command: cargo test --release --target x86_64-unknown-linux-musl
+          command: cargo test --target x86_64-unknown-linux-musl
       - run:
           name: Build executable
-          command: cargo build --release --target x86_64-unknown-linux-musl
+          command: cargo build --target x86_64-unknown-linux-musl
       - run:
           name: Copy build to workspace
           command: cp -R target /tmp/workspace/
@@ -31,10 +31,10 @@ jobs:
           root: /tmp/workspace/
           paths: target/x86_64*
       - store_artifacts:
-          path: target/x86_64-unknown-linux-musl/release/deployment-cli
+          path: target/x86_64-unknown-linux-musl/debug/deployment-cli
   macos_build:
     docker:
-      - image: "circleci/rust:1.33.0"
+      - image: "circleci/rust:1.36.0"
     steps:
       - checkout
       - setup_remote_docker:
@@ -46,7 +46,7 @@ jobs:
           name: Install required dependencies
           command: |
             sudo apt update
-            sudo apt install wget git clang
+            sudo apt install wget git clang cmake
       - run:
           name: Install build target
           command: rustup target add x86_64-apple-darwin
@@ -80,25 +80,26 @@ jobs:
           at: /tmp/workspace
       - run:
           name: Copy binary to directory of Dockerfile
-          command: cp /tmp/workspace/target/x86_64-unknown-linux-musl/release/deployment-cli deployment-cli
+          command: cp /tmp/workspace/target/x86_64-unknown-linux-musl/debug/deployment-cli deployment-cli
       - run:
           name: Build docker image
-          command: docker build -t navikt/deployment-cli:${CIRCLE_TAG:-$CIRCLE_SHA1} .
+          command: docker build -t navikt/deployment-cli:$CIRCLE_SHA1 .
       - run:
           name: Docker push
           command: |
             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-            docker push navikt/deployment-cli:${CIRCLE_TAG:-$CIRCLE_SHA1}
-
-            # Don't push latest on tag builds, only on master builds
-            if [ -z ${CIRCLE_TAG} ]
-            then
+            if [ -n "${CIRCLE_TAG}" ]; then
+                VERSION="$(printf "$CIRCLE_TAG" | cut -c 5-)"
+                docker tag navikt/deployment-cli:$CIRCLE_SHA1 navikt/deployment-cli:$VERSION
+                docker push navikt/deployment-cli:$VERSION
+            else
                 docker tag navikt/deployment-cli:$CIRCLE_SHA1 navikt/deployment-cli:latest
+                docker push navikt/deployment-cli:$CIRCLE_SHA1
                 docker push navikt/deployment-cli:latest
             fi
   github_release:
     docker:
-      - image: "circleci/golang:1.8"
+      - image: "circleci/golang:1.13"
     steps:
       - attach_workspace:
           at: /tmp/workspace
@@ -112,11 +113,12 @@ jobs:
           name: Compress files
           command: |
             mkdir artifacts
-            cat /tmp/workspace/target/x86_64-unknown-linux-musl/release/deployment-cli | lzma > artifacts/deployment-cli-${CIRCLE_TAG}-x86_64-unknown-linux-musl.xz
-            cat /tmp/workspace/target/x86_64-apple-darwin/release/deployment-cli | lzma > artifacts/deployment-cli-${CIRCLE_TAG}-x86_64-apple-darwin.xz
+            VERSION="$(printf "$CIRCLE_TAG" | cut -c 5-)"
+            cat /tmp/workspace/target/x86_64-unknown-linux-musl/debug/deployment-cli | lzma > artifacts/deployment-cli-$VERSION-x86_64-unknown-linux-musl.xz
+            cat /tmp/workspace/target/x86_64-apple-darwin/release/deployment-cli | lzma > artifacts/deployment-cli-$VERSION-x86_64-apple-darwin.xz
       - run:
           name: Create release
-          command: ghr -t "$(/tmp/workspace/target/x86_64-unknown-linux-musl/release/deployment-cli token)" -u navikt -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} artifacts/
+          command: ghr -t "$(/tmp/workspace/target/x86_64-unknown-linux-musl/debug/deployment-cli token)" -u navikt -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} artifacts/
 workflows:
   version: 2
   build_and_release:
@@ -124,11 +126,11 @@ workflows:
       - linux_build:
           filters:
             tags:
-              only: /^v.+/
+              only: /^cli-.+/
       - macos_build:
           filters:
             tags:
-              only: /^v.+/
+              only: /^cli-.+/
       - docker_release:
           requires:
             - linux_build
@@ -137,7 +139,7 @@ workflows:
             branches:
               only: master
             tags:
-              only: /^v.+/
+              only: /^cli-.+/
       - github_release:
           requires:
             - linux_build
@@ -146,5 +148,5 @@ workflows:
             branches:
               ignore: /.*/
             tags:
-              only: /^v.+/
+              only: /^cli-.+/
 only: master

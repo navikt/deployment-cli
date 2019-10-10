@@ -20,22 +20,22 @@ To see the help info for a subcommand of a subcommand, type either one of
 `deployment-cli deploy` contains a few subcommands for easily creating Github Deployments using the Github API:
 
 ### Creating a deployment
-Creating a deployment is done using the `deployment-cli deploy create` or  command. It will also do templating using
-handlebars ib the resource files specified with `-r/--resource`. The values used for templating can be specified using
+Creating a deployment is done using the `deployment-cli deploy create` command. It will also do templating using
+handlebars in the resource files specified with `-r/--resource`. The values used for templating can be specified using
 the config file specified by `-v/--vars`. `deployment-cli` will also inject a few values regardless of specifying a
 config file:
 * ref: Git reference, i.e. branch name, tag name or commit SHA. Specified by the `--ref` flag. Default: `master`
 * cluster: which Nais Kubernetes cluster the deploy is for. Specified by the `--cluster/-c` flag. Default: `dev-fss`
 * team: the Github team this deployment is for. Specified by the `--team/t` flag.
-* version: the version, this is strictly for templating and should be used to specify which version of the Docker file
-should be pulled. Specified using the `--version` flag
-
 
 The most basic deployment should look something like:
                                                                                    
-`deployment-cli deploy create --cluster=dev-fss --repository=navikt/deployment --team=<team> --version=1.0.0 --appid=1234 --key=/path/to/private-key.pem --resource=nais.yaml --vars=placeholders.json`
+`deployment-cli deploy create --cluster=dev-fss --repository=navikt/deployment --team=<team> --var version=1.0.0 --appid=1234 --key=/path/to/private-key.pem --resource=nais.yaml --vars=placeholders.json`
                                                                                    
 Note: For deployments using [Github Apps](https://lab.github.com/githubtraining/getting-started-with-github-apps) the private key has to be [PEM encoded](https://support.quovadisglobal.com/kb/a37/what-is-pem-format.aspx). Use the flag `--key-base64` instead of `--key`.
+
+## Github Personal Access Token
+If your using access tokens either manually or via Github Actions workflows, you can use the `--token` flag to authenticate.
 
 ### Dumping the payload to stdout
 If you want to just dump the payload to stdout you can do deployment-cli deploy payload with the same flags used in

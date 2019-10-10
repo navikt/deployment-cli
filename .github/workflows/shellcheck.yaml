@@ -1,0 +1,14 @@
+name: Shellcheck action/entrypoint.sh
+on:
+  push:
+    paths:
+      - action/entrypoint.sh
+jobs:
+  shellcheck:
+    name: Shellcheck action/entrypoint.sh
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
+      - name: Shellcheck time
+        run: shellcheck action/entrypoint.sh

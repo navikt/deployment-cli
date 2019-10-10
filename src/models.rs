@@ -4,6 +4,7 @@ use serde_json::Value;
 pub struct DeploymentRequest {
     #[serde(rename = "ref")]
     pub git_ref: String,
+    pub auto_merge: bool,
     pub description: String,
     pub environment: String,
     pub payload: Payload,
@@ -47,8 +48,20 @@ pub struct InstallationToken {
     pub expires_at: String
 }
 
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Clone)]
+#[serde(rename_all = "snake_case")]
+pub enum DeploymentState {
+    Failure,
+    Error,
+    Success,
+    TimedOut,
+    #[serde(other)]
+    Other
+}
+
 #[derive(Deserialize, Debug, Eq, PartialEq, Clone)]
 pub struct DeploymentStatus {
     pub id: u64,
-    pub state: String
+    pub state: DeploymentState,
+    pub target_url: String
 }
