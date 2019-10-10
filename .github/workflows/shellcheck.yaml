@@ -2,7 +2,7 @@ name: Shellcheck action/entrypoint.sh
 on:
   push:
     paths:
-      - action/entrypoint.sh
+      - 'action/entrypoint.sh'
 jobs:
   shellcheck:
     name: Shellcheck action/entrypoint.sh
