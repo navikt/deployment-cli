@@ -5,7 +5,7 @@ mod exchange_token;
 use clap::{App, Arg, SubCommand, ArgMatches};
 use failure::Error;
 
-const ALLOWED_CLUSTERS: &[&'static str] = &["dev-fss", "dev-sbs", "prod-fss", "prod-sbs", "staging-gcp", "dev-gcp", "prod-gcp"];
+const ALLOWED_CLUSTERS: &[&'static str] = &["dev-fss", "dev-sbs", "prod-fss", "prod-sbs", "staging-gcp", "dev-gcp", "prod-gcp", "kubeflow"];
 
 pub fn execute_command(args: &ArgMatches) -> Result<(), Error> {
     if let Some(token_command) = args.subcommand_matches("token") {
