@@ -90,7 +90,7 @@ pub fn create_cli_app<'a, 'b>() -> App<'a, 'b> {
         .arg(Arg::with_name("ref")
             .short("g")
             .long("ref")
-            .help("Git reference to be deployed. This can be a branch name, a tag name or the SHA checksum of a commit")
+            .help("Git reference for the deployment frontend. This can be a branch name, a tag name or the SHA checksum of a commit. NB: This does not dictate what is deployed!")
             .takes_value(true)
             .global(true)
             .default_value("master"))
