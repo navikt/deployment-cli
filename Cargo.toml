@@ -13,7 +13,7 @@ handlebars="2.0"
 clap="2"
 jsonwebtoken="6.0"
 rpassword="4.0"
-base64="0.10"
+base64="0.11"
 mockito="0.21"
 failure="0.1"
 
