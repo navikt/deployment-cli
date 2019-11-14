@@ -197,7 +197,7 @@ pub fn create_cli_app<'a, 'b>() -> App<'a, 'b> {
                 .arg(Arg::with_name("poll-interval")
                     .long("poll-interval")
                     .help("Specifies the interval in ms used for polling while awaiting a github status update")
-                    .default_value("1000")
+                    .default_value("5000")
                     .required(true))))
 
             .subcommand(SubCommand::with_name("payload")
