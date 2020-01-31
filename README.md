@@ -1,4 +1,7 @@
 # deployment-cli
+
+## This repo is now deprecated and archived. You should start using [nais/deploy](https://doc.nais.io/deployment) instead.
+
 A command line utility for deploying applications to the Nais platform. It is a companion tool for https://github.com/navikt/deployment 
 
 The use case is in the deploy step of a build & deploy pipeline implemented in an as-a-service product such as Circle CI og Travis CI. It is supposed to be a human-friendly and standardized alternative to do-it-yourself bash scripting with the curl command etc.
@@ -35,7 +38,7 @@ The most basic deployment should look something like:
 Note: For deployments using [Github Apps](https://lab.github.com/githubtraining/getting-started-with-github-apps) the private key has to be [PEM encoded](https://support.quovadisglobal.com/kb/a37/what-is-pem-format.aspx). Use the flag `--key-base64` instead of `--key`.
 
 ## Github Personal Access Token
-If your using access tokens either manually or via Github Actions workflows, you can use the `--token` flag to authenticate.
+If you're using access tokens either manually or via Github Actions workflows, you can use the `--token` flag to authenticate.
 
 ### Dumping the payload to stdout
 If you want to just dump the payload to stdout you can do deployment-cli deploy payload with the same flags used in
